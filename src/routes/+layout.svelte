@@ -1,30 +1,37 @@
 <script>
-	// import Header from './Header.svelte';
-	import './styles.css';
+	import Header from "$lib/Header.svelte";
+	import "./styles.css";
+
+	let y = 0
+	let box = null
+	const handleScroll = () => {
+			y = box.scrollTop
+	}
 </script>
 
-<div class="app">
-	<!-- <Header /> -->
+<svelte:head>
+	<title>aparimeya.ai</title>
+	<meta name="description" content="Aparimeya Taneja's persoal website" />
+</svelte:head>
 
-	
-		<slot />
-
-
-	<!-- <footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
-	</footer> -->
+<div class="app" bind:this={box}  on:scroll={handleScroll}>
+	<Header {y}/>
+	<slot />
+	<footer>
+		<p>{y} <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+	</footer>
 </div>
 
 <style>
 	.app {
 		display: flex;
-
 		background-color: rgb(10, 10, 10);
-		position: relative;
-		align-items: center;
-height: 100%;
-	}
-
+		flex-direction: column;
+		scroll-snap-type: y mandatory;
+		overflow: auto;
+		height: 100dvh;
+		scroll-behavior: smooth;
+		}
 
 	footer {
 		display: flex;
@@ -32,7 +39,10 @@ height: 100%;
 		justify-content: center;
 		align-items: center;
 		padding: 12px;
-	} 
+		position: fixed;
+		bottom: 0px;
+		color: aliceblue;
+	}
 
 	@media (min-width: 480px) {
 		footer {
