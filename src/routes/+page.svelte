@@ -1,22 +1,25 @@
 <script>
 
+
 </script>
 
 <section id="home">
-	<a href="#about">about</a>j
+home
+
 </section>
-<section id="about">
-	<a href="#home">home</a>k
-</section>
-<section id="projects">
-	<a href="#home">home</a>l
-</section>
+<section id="about">about</section>
+<section id="projects">projects</section>
+<section id="contact">contact</section>
+
 <style>
-section{
-	min-height:100dvh;
-	color:white;
-	display: block;
-	position: relative;
-	scroll-snap-align: center;
-}
+	section {
+		min-height: 100dvh;
+		width: 100vw;
+		color: white;
+		position: relative;
+		scroll-snap-align: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 </style>
