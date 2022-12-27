@@ -86,7 +86,7 @@
                 if (a.x < margin) {a.vx = 1;a.x=margin}
                 if (a.x > w - margin) {a.vx = -1;a.x=w-margin}
                 if (a.y < margin) {a.vy = 1;a.y=margin}
-                if (a.y > h- margin) {a.vy = 1;a.y=margin}
+                if (a.y > h- margin) {a.vy = 1;a.y=h-margin}
             }
         };
         canvas.style.opacity = 1;
