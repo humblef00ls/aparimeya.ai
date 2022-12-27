@@ -3,16 +3,18 @@
     import { onMount } from "svelte";
     export let y = 0;
     let m = { x: 0, y: 0 };
-    let local = 150;
-    const damp = 0.85;
+    let local = 90;
+$: ll = local + Math.abs(20 * Math.sin((3.14 * y) / h))
+    const damp = 0.7;
     const margin = 5;
+    let h;
     function handleMousemove(event) {
         m.x = event.clientX;
         m.y = event.clientY;
     }
 
     onMount(() => {
-        let h = window.innerHeight;
+        h = window.innerHeight;
         let w = window.innerWidth;
 
         console.log(w, h);
@@ -65,7 +67,7 @@
                     let dx = a.x - b.x;
                     let dy = a.y - b.y;
                     let d = Math.sqrt(dx * dx + dy * dy);
-                    if (d > 0 && d < local) {
+                    if (d > 0 && d < ll ) {
                         let F = (g * 1) / d;
                         fx += F * dx;
                         fy += F * dy;
@@ -83,10 +85,22 @@
 
                 a.x += a.vx;
                 a.y += a.vy;
-                if (a.x < margin) {a.vx = 1;a.x=margin}
-                if (a.x > w - margin) {a.vx = -1;a.x=w-margin}
-                if (a.y < margin) {a.vy = 1;a.y=margin}
-                if (a.y > h- margin) {a.vy = 1;a.y=h-margin}
+                if (a.x < margin) {
+                    a.vx = 1;
+                    a.x = margin;
+                }
+                if (a.x > w - margin) {
+                    a.vx = -1;
+                    a.x = w - margin;
+                }
+                if (a.y < margin) {
+                    a.vy = 1;
+                    a.y = margin;
+                }
+                if (a.y > h - margin) {
+                    a.vy = 1;
+                    a.y = h - margin;
+                }
             }
         };
         canvas.style.opacity = 1;
@@ -96,11 +110,11 @@
             ctx.fillRect(x - s / 2, y - s / 2, s, s);
         };
         // let yellow = create(300, "yellow");
-        const S = Math.min(Math.min(h,w),800)
-        local = S / 6
-        let white = create((S * 2) , "white", 1);
-        let red = create((S * 1.5), "red", 2);
-        let blue = create(S, "cyan", 3);
+        const S = Math.min(Math.min(h, w), 800);
+        let white = create(S * 2, "white", 1);
+        let red = create(S * 1.5, "red", 2);
+        let blue = create(S, "DarkTurquoise", 3);
+        let purple = create(S / 2, "purple", 5);
         // let white = create(3, "white", 1.5);
         // let red = create(3, "red", 2);
         // let blue = create(100, "cyan", 3);
@@ -111,7 +125,11 @@
         });
 
         function update() {
-            rule(red, red, 0.04 + 2 * Math.sin(((3.14 * 2 * y) / h) * 2));
+            rule(
+                red,
+                red,
+                -0.04 + 0.03 * (y / h) + 2 * Math.sin(((3.14 * 2 * y) / h) * 2)
+            );
             rule(white, white, 0.02);
             rule(white, blue, 0.04 + 0.03 * (y / h));
             rule(blue, white, 0.005);
@@ -124,14 +142,20 @@
             );
             rule(white, red, -0.2 - 0.2 * (y / h));
             rule(red, white, -2 + 0.7 * (y / h));
-
+            rule(purple, white, -0.01);
+            rule(white, purple, 0.02);
+            rule(purple, purple, 0.002);
+            rule(purple, red, -0.002);
+            rule(purple, blue, -0.8);
+            rule(blue, purple, 0.2);
+            rule(red, purple, 0.1);
             ctx.fillStyle = "rgb(10,10,10)";
             ctx.fillRect(0, 0, w, h);
             // qtree = new QuadTree(boundary, 5, ctx);
 
             for (let i = 0; i < points.length; i++) {
                 const p = points[i];
-                draw(p.x, p.y, p.c, 2);
+                draw(p.x, p.y, p.c, p.s);
             }
             // evalF(points[0],rules)
             // qtree.show();
@@ -150,6 +174,10 @@
     });
 </script>
 
+<!-- <div>
+    RADIUS:
+    {ll}
+</div> -->
 <svelte:window on:mousemove={handleMousemove} />
 <canvas bind:this={canvas} />
 
@@ -162,5 +190,13 @@
         z-index: 0;
         opacity: 0;
         transition: 0.3s ease-in;
+    }
+    div {
+        color: white;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        z-index: 7;
+        opacity: .1;
     }
 </style>
