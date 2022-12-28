@@ -1,30 +1,36 @@
 <script>
     let canvas;
     import { onMount } from "svelte";
+    import { draggable } from "@neodrag/svelte";
+    let handle;
     let fps = 0;
     export let y = 0;
-    let S = 700;
-    let m = { x: 0, y: 0 };
+    let S = 450;
+    let count;
     let local = 90;
+
+    $: minDim =  Math.min(w, h) 
+    let frameId
     $: ll =
-        Math.max(local, Math.min(w, h) / 8) +
+        Math.max(local, minDim/ 10) +
         Math.abs(50 * Math.sin((3.14 * y) / h)) +
-        HS * 15;
-    let damp = 0.8;
-    $: dd = damp - HS * 0.05;
+        HS * 33;
+    let damp = 1;
+    $: dd = damp - HS * 0.075;
     $: HS = y / h;
-    $: SIN = Math.sin(3.14*y/h)
-    const margin = 5;
+    $: SIN = Math.sin((3.14 * y) / h);
+    $: COS = Math.cos((3.14 * y) / h);
+    $: POSSIN = Math.abs(SIN)  
+    $: POSCOS = Math.abs(COS)  
+    const  margin = 5 ;
+    $: push = margin + Math.min(100, minDim / 4)*Math.abs(SIN)
     let [h, w] = [0, 0];
-    // function handleMousemove(event) {
-    //     m.x = event.clientX;
-    //     m.y = event.clientY;
-    // }
+
     let RD = {};
     let WD = {};
     let BD = {};
     let PD = {};
-    onMount(() => {
+    const setup = () => {
         h = window.innerHeight;
         w = window.innerWidth;
 
@@ -34,12 +40,8 @@
         const ctx = canvas.getContext("2d", { alpha: false });
         const dpr = window.devicePixelRatio;
         const rect = canvas.getBoundingClientRect();
-
-        // Set the "actual" size of the canvas
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
-
-        // Scale the context to ensure correct drawing operations
         ctx.scale(dpr, dpr);
 
         let points = [];
@@ -65,7 +67,6 @@
                     )
                 );
                 points.push(group[i]);
-                // qtree.insert(new Point(group[i].x, group[i].y, c));
             }
             return group;
         };
@@ -79,7 +80,7 @@
                     let dx = a.x - b.x;
                     let dy = a.y - b.y;
                     let d = Math.sqrt(dx * dx + dy * dy);
-                    if (d > 0 && d < ll + b.s * 5) {
+                    if (d > 0 && d < ll + b.s * (1+b.s)) {
                         let F = (g * 1) / d;
                         F = F * dd;
                         fx += F * dx;
@@ -87,23 +88,22 @@
                     }
                 }
                 const scaler = Math.max(a.s * damp, 1);
-                a.vx = (a.vx / scaler + fx) * 0.5;
-                a.vy = (a.vy / scaler + fy) * 0.5;
-
+                a.vx = (a.vx / scaler + fx) * .5;
+                a.vy = (a.vy / scaler + fy) * .5;
 
                 a.x += a.vx;
                 a.y += a.vy;
                 if (a.x < margin) {
-                    a.vx = a.vx + 20;
+                    a.vx = a.vx + push;
                     a.x = margin;
                 } else if (a.x > w - margin) {
-                    a.vx = a.vx - 20;
+                    a.vx = a.vx - push;
                     a.x = w - margin;
                 } else if (a.y < margin) {
-                    a.vy = a.vy + 20;
+                    a.vy = a.vy + push;
                     a.y = margin;
                 } else if (a.y > h - margin) {
-                    a.vy = a.vy - 20;
+                    a.vy = a.vy - push;
                     a.y = h - margin;
                 }
             }
@@ -117,12 +117,12 @@
 
         const scaleX = Math.min(Math.min(h, w), S);
 
-        let white = create(scaleX * 2.4, "white", 1);
-        let red = create(scaleX * 1.8, "red", 2);
+        let white = create(scaleX * 2.65, "white", 1);
+        let red = create(scaleX * 1.85, "red", 2);
         let blue = create(scaleX / 1.1, "DarkTurquoise", 3);
-        let purple = create(scaleX / 5, "purple", 4);
+        let purple = create(scaleX / 6, "purple", 4);
         const times = [];
-
+        count = points.length
         function update() {
             const now = performance.now();
             while (times.length > 0 && times[0] <= now - 1000) {
@@ -131,29 +131,29 @@
             times.push(now);
             fps = times.length;
             RD = {
-                r: 0.04 - 0.004 * HS + 2 * SIN,
-                b: -1 + 0.23 * HS,
+                r: 0.04  + POSSIN + 0.1 * HS,
+                b: -1 - 0.23 * HS,
                 w: 0.2 - 0.09 * HS,
-                p: 0.4 - 0.5 * HS,
+                p: 0.4 - 0.2 * HS,
             };
             WD = {
                 r: -0.2 - 0.12 * HS,
-                b: -0.04 + 0.03 * HS,
-                w: 0.2 - 0.04 * HS,
-                p: 0.02,
+                b: 0.04 - 0.03 * HS,
+                w: 0.25 + POSSIN+.15*COS,
+                p: -0.02+.05*HS,
             };
             BD = {
                 r: -0.2 - 0.1 * HS,
-                b: 0.5 + 2 * SIN - 0.26 * HS,
-                w: -0.05,
+                b: 0.5 + POSSIN - 0.05 * HS,
+                w: -0.05+0.03*HS,
                 p: -0.2,
             };
             PD = {
-                r:-1 + 0.15 * HS,
-                b:-0.3,
-                w:-0.01 - 0.02 * HS,
-                p:-0.1 + 0.08 * HS
-            }
+                r: -1 + 0.15 * HS,
+                b: -0.3,
+                w: -0.01 - 0.02 * HS,
+                p: 0.2 + 2* HS +  POSSIN,
+            };
             rule(red, red, RD.r);
             rule(red, blue, RD.b);
             rule(red, white, RD.w);
@@ -166,10 +166,9 @@
             rule(blue, red, BD.r);
             rule(blue, blue, BD.b);
             rule(blue, purple, BD.p);
-
-            rule(purple, white, PD.w );
-            rule(purple, purple,PD.p );
-            rule(purple, red,PD.r );
+            rule(purple, white, PD.w);
+            rule(purple, purple, PD.p);
+            rule(purple, red, PD.r);
             rule(purple, blue, PD.b);
 
             ctx.fillStyle = "rgb(11,11,11)";
@@ -184,12 +183,13 @@
             frameId = requestAnimationFrame(update);
         }
 
-        let frameId = requestAnimationFrame(update);
+         frameId = requestAnimationFrame(update);
 
         return () => {
             cancelAnimationFrame(frameId);
         };
-    });
+    }
+    onMount(setup);
 
     const lim = (o) =>
         typeof o === "object" && o !== null
@@ -197,31 +197,51 @@
             : Math.round(o * 100) / 100;
 </script>
 
-<div class="panel">
-    F:{fps}
+<div class="panel" use:draggable={{ handle }}>
+    <div bind:this={handle} >here</div>
+    <span>
+    <button on:click={()=>{  cancelAnimationFrame(frameId); setup()}}>redo</button>
+</span>
+<span>
+    FPS:{fps}
+</span>
+<span>
     R:
     {lim(ll)}
+    <input type=range bind:value={local} min=0 max=200 step=1>
+</span>
+<span>
     S:
-    {lim(S)}
+    {lim(count)}
+    <input type=range bind:value={S} min=100 max=1000 step=10>
+</span>
+<span>
     D:
     {lim(dd)}
-    Sin:
+    <input type=range bind:value={damp} min=-1 max=1 step=".025">
+</span>
+<span>
+    sin:
     {lim(SIN)}
+</span>
+
+<span>
+    cos:
+    {lim(COS)}
+</span>
     <div class="sub-panel">
         <span>
-        red : {JSON.stringify(lim(RD))}
-    </span>
-    <span>
-        white : {JSON.stringify(lim(WD))}
-    </span>
-    <span>
-        
-        blue : {JSON.stringify(lim(BD))}
-
-    </span>
-    <span>
-        purple : {JSON.stringify(lim(PD))}
-    </span>
+            red : {JSON.stringify(lim(RD))}
+        </span>
+        <span>
+            white : {JSON.stringify(lim(WD))}
+        </span>
+        <span>
+            blue : {JSON.stringify(lim(BD))}
+        </span>
+        <span>
+            purple : {JSON.stringify(lim(PD))}
+        </span>
     </div>
 </div>
 <!-- <svelte:window on:mousemove={handleMousemove} /> -->
@@ -246,14 +266,16 @@
         opacity: 1;
         padding: 10px;
         border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+
     }
     .sub-panel {
         padding: 5px;
         background-color: rgba(255, 255, 255, 0.05);
-        display:flex;
+        display: flex;
         flex-direction: column;
     }
-    .sub-panel > span{
-
+    .sub-panel > span {
     }
 </style>
