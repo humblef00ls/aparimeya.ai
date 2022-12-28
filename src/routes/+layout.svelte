@@ -20,7 +20,7 @@
 </svelte:head>
 <Simulation {y}/>
 <div class="app" bind:this={box} on:scroll={handleScroll}>
-	<header class:slide={y > h / 3}>
+	<header class:slide={y > h / 2}>
 		<h3><a href="#home">home</a></h3>
 		<h3><a href="#about">about</a></h3>
 		<h3><a href="#projects">projects</a></h3>
