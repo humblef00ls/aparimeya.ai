@@ -1,23 +1,28 @@
 <script>
     let canvas;
     import { onMount } from "svelte";
+    
     export let y = 0;
+    let S = 100
     let m = { x: 0, y: 0 };
-    let local = 90;
-$: ll = local + Math.abs(20 * Math.sin((3.14 * y) / h))
-    const damp = 0.7;
+    let local = 100;
+    $: ll =lim(
+        Math.max(local, Math.min(w, h) / 8) +
+        Math.abs(50 * Math.sin((3.14 * y) / h)) +
+        (y / h) * 10)
+    let damp = 0.9;
+    $: dd = lim(damp - (y/h)*.05)
     const margin = 5;
-    let h;
+    let [h, w] = [0, 0];
     function handleMousemove(event) {
         m.x = event.clientX;
         m.y = event.clientY;
     }
-
+const lim = (num) => Math.round(num * 100) / 100
     onMount(() => {
         h = window.innerHeight;
-        let w = window.innerWidth;
+        w = window.innerWidth;
 
-        console.log(w, h);
         canvas.height = h;
         canvas.width = w;
 
@@ -34,7 +39,14 @@ $: ll = local + Math.abs(20 * Math.sin((3.14 * y) / h))
 
         let points = [];
         const point = (x, y, c, s) => {
-            return { x: x, y: y, vx: 0, vy: 0, c: c, s: s };
+            return {
+                x: x,
+                y: y,
+                vx: 20 * Math.random() - 10,
+                vy: 20 * Math.random() - 10,
+                c: c,
+                s: s,
+            };
         };
         const create = (n, c, s = 3.5) => {
             let group = [];
@@ -42,7 +54,7 @@ $: ll = local + Math.abs(20 * Math.sin((3.14 * y) / h))
                 group.push(
                     point(
                         Math.random() * (w - 100) + 50,
-                        Math.random() * (h - 200) + 100,
+                        Math.random() * (h - 100) + 50,
                         c,
                         Math.random() * 0.5 + s
                     )
@@ -53,6 +65,7 @@ $: ll = local + Math.abs(20 * Math.sin((3.14 * y) / h))
             return group;
         };
         const rule = (atoms1, atoms2, g) => {
+            g = lim(g)
             for (let i = 0; i < atoms1.length; i++) {
                 let fx = 0;
                 let fy = 0;
@@ -66,15 +79,17 @@ $: ll = local + Math.abs(20 * Math.sin((3.14 * y) / h))
                     let b = atoms2[j];
                     let dx = a.x - b.x;
                     let dy = a.y - b.y;
-                    let d = Math.sqrt(dx * dx + dy * dy);
-                    if (d > 0 && d < ll ) {
+                    let d = lim(Math.sqrt(dx * dx + dy * dy))
+                    if (d > 0 && d < ll + b.s*5) {
                         let F = (g * 1) / d;
+                        F = F * dd;
                         fx += F * dx;
                         fy += F * dy;
                     }
                 }
-                a.vx = (a.vx + fx * damp) * 0.5;
-                a.vy = (a.vy + fy * damp) * 0.5;
+                const scaler = Math.max(a.s * damp, 1);
+                a.vx = (a.vx / scaler + fx) * 0.5;
+                a.vy = (a.vy / scaler + fy) * 0.5;
 
                 if (a.x <= 0 || a.x >= w) {
                     a.vx *= -2;
@@ -98,7 +113,7 @@ $: ll = local + Math.abs(20 * Math.sin((3.14 * y) / h))
                     a.y = margin;
                 }
                 if (a.y > h - margin) {
-                    a.vy = 1;
+                    a.vy = -1;
                     a.y = h - margin;
                 }
             }
@@ -109,75 +124,70 @@ $: ll = local + Math.abs(20 * Math.sin((3.14 * y) / h))
             ctx.fillStyle = c;
             ctx.fillRect(x - s / 2, y - s / 2, s, s);
         };
-        // let yellow = create(300, "yellow");
-        const S = Math.min(Math.min(h, w), 800);
-        let white = create(S * 2, "white", 1);
-        let red = create(S * 1.5, "red", 2);
+
+        S = Math.min(Math.min(h, w), 800) + 200;
+
+        let white = create(S * 2.1, "white", 1);
+        let red = create(S * 1.75, "red", 2);
         let blue = create(S, "DarkTurquoise", 3);
-        let purple = create(S / 2, "purple", 5);
-        // let white = create(3, "white", 1.5);
-        // let red = create(3, "red", 2);
-        // let blue = create(100, "cyan", 3);
-        // let green = create(20, "green");
-        window.addEventListener("mousedown", () => {
-            points.push(point(m.x, m.y, "green", 2));
-            qtree.insert(new Point(m.x, m.y, "green"));
-        });
+        let purple = create(S / 4, "purple", 4);
+
 
         function update() {
             rule(
                 red,
                 red,
-                -0.04 + 0.03 * (y / h) + 2 * Math.sin(((3.14 * 2 * y) / h) * 2)
+                0.04 - 0.01 * (y / h) + 2 * Math.sin(((3.14 * 2 * y) / h) * 2)
             );
-            rule(white, white, 0.02);
-            rule(white, blue, 0.04 + 0.03 * (y / h));
-            rule(blue, white, 0.005);
+            rule(white, white, 0.2 - 0.09 * (y / h));
+            rule(white, blue, -0.04 + 0.03 * (y / h));
+            rule(blue, white, -0.05);
             rule(blue, red, -0.2 - 0.1 * (y / h));
-            rule(red, blue, -0.5);
+            rule(red, blue, -1 + 0.23 * (y / h));
             rule(
                 blue,
                 blue,
-                0.1 + 2 * Math.sin((3.14 * 2 * y) / h) - 0.2 * (y / h)
+                0.5 + 2 * Math.sin((3.14 * 2 * y) / h) - 0.4 * (y / h)
             );
-            rule(white, red, -0.2 - 0.2 * (y / h));
-            rule(red, white, -2 + 0.7 * (y / h));
-            rule(purple, white, -0.01);
+            rule(white, red, -0.2 - 0.12 * (y / h));
+            rule(red, white, 0.2 - 0.09 * (y / h));
+            rule(purple, white, -0.01 - 0.02 * (y / h));
             rule(white, purple, 0.02);
-            rule(purple, purple, 0.002);
-            rule(purple, red, -0.002);
-            rule(purple, blue, -0.8);
-            rule(blue, purple, 0.2);
-            rule(red, purple, 0.1);
-            ctx.fillStyle = "rgb(10,10,10)";
+            rule(purple, purple, -0.1 + 0.08 * (y / h));
+            rule(purple, red, -1+ 0.15 * (y / h));
+            rule(purple, blue, -0.3);
+            rule(blue, purple, -0.2);
+            rule(red, purple, 0.4 - 0.5 * (y / h));
+
+            ctx.fillStyle = "rgb(11,11,11)";
             ctx.fillRect(0, 0, w, h);
-            // qtree = new QuadTree(boundary, 5, ctx);
 
             for (let i = 0; i < points.length; i++) {
                 const p = points[i];
-                draw(p.x, p.y, p.c, p.s);
+                draw(p.x - p.s / 2, p.y - p.s / 2, p.c, p.s);
             }
-            // evalF(points[0],rules)
-            // qtree.show();
+
             ctx.save();
-            // console.log("X::vel",points[0].vx,"pos",points[0].x);
-            // console.log("Y::vel",points[0].vy,"pos",points[0].y);
 
-            requestAnimationFrame(update);
+            frameId = requestAnimationFrame(update);
         }
-        // update();
-        requestAnimationFrame(update);
 
-        // return () => {
-        //     cancelAnimationFrame(frameId);
-        // };
+        let frameId = requestAnimationFrame(update);
+
+        return () => {
+            cancelAnimationFrame(frameId);
+        };
     });
 </script>
 
-<!-- <div>
-    RADIUS:
+<div class="panel">
+    R:
     {ll}
-</div> -->
+    S:
+    {S}
+    D:
+    {dd}
+</div>
 <svelte:window on:mousemove={handleMousemove} />
 <canvas bind:this={canvas} />
 
@@ -191,12 +201,15 @@ $: ll = local + Math.abs(20 * Math.sin((3.14 * y) / h))
         opacity: 0;
         transition: 0.3s ease-in;
     }
-    div {
+    .panel {
         color: white;
         position: fixed;
-        top: 0px;
-        left: 0px;
+        bottom: 5px;
+        right: 5px;
         z-index: 7;
-        opacity: .1;
+        opacity: 1;
+        padding: 10px;
+        backdrop-filter: blur(3px);
+        border-radius: 5px;
     }
 </style>
