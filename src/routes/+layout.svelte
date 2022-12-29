@@ -73,9 +73,8 @@
 	header h3 {
 		padding: 5px;
 		letter-spacing: 4px;
-		backdrop-filter: blur(1px);
-		transition: ease-in-out 0.4s;
-		opacity: .65;
+		transition: ease-in-out 0.33s;
+		opacity: .575;
 	}
 	.slide {
 		transform: translate(0%, 0px);

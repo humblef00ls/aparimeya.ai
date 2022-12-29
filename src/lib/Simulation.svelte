@@ -6,14 +6,14 @@
 
     let showDebugger = false;
     let fps = 0;
-    let S = 550;
-    let count= 0;
-    let local = 70;
+    let S = 500;
+    let count = 0;
+    let local = 85;
     $: minDim = Math.min(w, h);
     let frameId = null;
     $: ll = local + minDim / 100 + POSSIN + HS * 30;
     let damp = 0.95;
-    $: dd = damp - HS * 0.075;
+    $: dd = damp - HS * 0.06 - 0.4 * POSSIN;
     $: HS = $Y / h;
     $: SIN = Math.sin((3.14 * $Y) / h);
     $: COS = Math.cos((3.14 * $Y) / h);
@@ -22,7 +22,7 @@
     let margin = 5;
     $: push = margin + Math.max(100, minDim / 4) * Math.abs(SIN);
     let [h, w] = [0, 0];
-
+    const [R, W, B, P, BG] = ["red", "white", "cyan", "purple", "black"];
     let RD = {};
     let WD = {};
     let BD = {};
@@ -114,10 +114,10 @@
 
         const scaleX = Math.min(Math.min(h, w), S);
 
-        let white = create(scaleX * 2.5, "white", 1);
-        let red = create(scaleX * 1.75, "red", 2);
-        let blue = create(scaleX / 1, "DarkTurquoise", 3);
-        let purple = create(scaleX / 6, "purple", 4);
+        let white = create(scaleX * 2.5, W, 1);
+        let red = create(scaleX * 1.75, R, 2);
+        let blue = create(scaleX / 1, B, 3);
+        let purple = create(scaleX / 6, P, 4);
         const times = [];
         count = points.length;
         function update() {
@@ -128,7 +128,7 @@
             times.push(now);
             fps = times.length;
             RD = {
-                r: 0.1 + -1*POSSIN + 0.05 * HS,
+                r: 0.1 + -1 * POSSIN + 0.05 * HS,
                 b: -1 - 0.23 * HS,
                 w: 0.2 - 0.09 * HS,
                 p: 0.4 - 0.2 * HS,
@@ -142,14 +142,14 @@
             BD = {
                 r: -0.2 - 0.1 * HS,
                 b: 0.5 + POSSIN - 0.025 * HS,
-                w: -0.05 + 0.03 * HS,
+                w: -0.07 + 0.05 * HS,
                 p: -0.2,
-            }; 
+            };
             PD = {
                 r: -1 + 0.15 * HS,
-                b: -0.4+HS*.3,
+                b: -0.4 + HS * 0.075,
                 w: -0.1 + 0.1 * HS,
-                p: 0.2 + 2 * HS + POSSIN,
+                p: 0.2 + 0.5 * HS + POSSIN,
             };
             rule(red, red, RD.r);
             rule(red, blue, RD.b);
@@ -168,7 +168,7 @@
             rule(purple, red, PD.r);
             rule(purple, blue, PD.b);
 
-            ctx.fillStyle = "rgb(11,11,11)";
+            ctx.fillStyle = BG;
             ctx.fillRect(0, 0, w, h);
 
             for (let i = 0; i < points.length; i++) {
@@ -197,14 +197,19 @@
         setup();
     };
     const reset = () => {
-        S = 550;
-        local = 70;
+        S = 500;
+        local = 85;
         damp = 0.95;
         margin = 5;
     };
 </script>
 
-<button class:fade={HS>=.7}  class="setting" on:click={() => (showDebugger = true)} style={`animation-duration:${20+HS*5}s`}>
+<button
+    class:fade={HS >= 0.7}
+    class="setting"
+    on:click={() => (showDebugger = true)}
+    style={`animation-duration:${20 + HS * 5}s`}
+>
     <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -321,20 +326,18 @@
         right: 5px;
         bottom: 5px;
         z-index: 20;
-        padding:0px;
-        margin:0px;
-        transition:.4s ease-in-out;
-        opacity:1;
+        padding: 0px;
+        margin: 0px;
+        transition: 0.4s ease-in-out;
+        opacity: 1;
         animation: rotation 20s infinite linear;
-
     }
-    .fade{
-        opacity:.25;
+    .fade {
+        opacity: 0.25;
         animation: rotation 40s infinite linear;
-
     }
-    .setting:hover{
-        opacity:1 !important;
+    .setting:hover {
+        opacity: 1 !important;
     }
     .setting {
         background: none;
@@ -365,6 +368,7 @@
         background-color: rgba(0, 0, 0, 0.1);
         font-family: "Space Mono", monospace;
         font-size: 0.75rem;
+        -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
     }
     .sub-panel {
@@ -413,11 +417,11 @@
         margin-top: 6px;
     }
     @keyframes rotation {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(359deg);
-  }
-}
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
+    }
 </style>
