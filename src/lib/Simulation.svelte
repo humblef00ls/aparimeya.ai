@@ -2,28 +2,25 @@
     let canvas;
     import { onMount } from "svelte";
     import { draggable } from "@neodrag/svelte";
-    let handle;
-    let fps = 0;
-    export let y = 0;
-    let S = 450;
-    let count;
-    let local = 90;
+    import { Y } from "$lib/store";
 
-    $: minDim =  Math.min(w, h) 
-    let frameId
-    $: ll =
-        Math.max(local, minDim/ 10) +
-        Math.abs(50 * Math.sin((3.14 * y) / h)) +
-        HS * 33;
-    let damp = 1;
+    let showDebugger = false;
+    let fps = 0;
+    let S = 550;
+    let count= 0;
+    let local = 70;
+    $: minDim = Math.min(w, h);
+    let frameId = null;
+    $: ll = local + minDim / 100 + POSSIN + HS * 30;
+    let damp = 0.95;
     $: dd = damp - HS * 0.075;
-    $: HS = y / h;
-    $: SIN = Math.sin((3.14 * y) / h);
-    $: COS = Math.cos((3.14 * y) / h);
-    $: POSSIN = Math.abs(SIN)  
-    $: POSCOS = Math.abs(COS)  
-    const  margin = 5 ;
-    $: push = margin + Math.min(100, minDim / 4)*Math.abs(SIN)
+    $: HS = $Y / h;
+    $: SIN = Math.sin((3.14 * $Y) / h);
+    $: COS = Math.cos((3.14 * $Y) / h);
+    $: POSSIN = Math.abs(SIN);
+    $: POSCOS = Math.abs(COS);
+    let margin = 5;
+    $: push = margin + Math.max(100, minDim / 4) * Math.abs(SIN);
     let [h, w] = [0, 0];
 
     let RD = {};
@@ -80,7 +77,7 @@
                     let dx = a.x - b.x;
                     let dy = a.y - b.y;
                     let d = Math.sqrt(dx * dx + dy * dy);
-                    if (d > 0 && d < ll + b.s * (1+b.s)) {
+                    if (d > 0 && d < ll + b.s * b.s) {
                         let F = (g * 1) / d;
                         F = F * dd;
                         fx += F * dx;
@@ -88,8 +85,8 @@
                     }
                 }
                 const scaler = Math.max(a.s * damp, 1);
-                a.vx = (a.vx / scaler + fx) * .5;
-                a.vy = (a.vy / scaler + fy) * .5;
+                a.vx = (a.vx / scaler + fx) * 0.5;
+                a.vy = (a.vy / scaler + fy) * 0.5;
 
                 a.x += a.vx;
                 a.y += a.vy;
@@ -117,12 +114,12 @@
 
         const scaleX = Math.min(Math.min(h, w), S);
 
-        let white = create(scaleX * 2.65, "white", 1);
-        let red = create(scaleX * 1.85, "red", 2);
-        let blue = create(scaleX / 1.1, "DarkTurquoise", 3);
+        let white = create(scaleX * 2.5, "white", 1);
+        let red = create(scaleX * 1.75, "red", 2);
+        let blue = create(scaleX / 1, "DarkTurquoise", 3);
         let purple = create(scaleX / 6, "purple", 4);
         const times = [];
-        count = points.length
+        count = points.length;
         function update() {
             const now = performance.now();
             while (times.length > 0 && times[0] <= now - 1000) {
@@ -131,28 +128,28 @@
             times.push(now);
             fps = times.length;
             RD = {
-                r: 0.04  + POSSIN + 0.1 * HS,
+                r: 0.1 + -1*POSSIN + 0.05 * HS,
                 b: -1 - 0.23 * HS,
                 w: 0.2 - 0.09 * HS,
                 p: 0.4 - 0.2 * HS,
             };
             WD = {
-                r: -0.2 - 0.12 * HS,
-                b: 0.04 - 0.03 * HS,
-                w: 0.25 + POSSIN+.15*COS,
-                p: -0.02+.05*HS,
+                r: -0.2 - 0.08 * HS,
+                b: 0.04 + 0.03 * HS,
+                w: 0.25 + POSSIN + 0.15 * COS,
+                p: -0.02 + 0.05 * HS,
             };
             BD = {
                 r: -0.2 - 0.1 * HS,
-                b: 0.5 + POSSIN - 0.05 * HS,
-                w: -0.05+0.03*HS,
+                b: 0.5 + POSSIN - 0.025 * HS,
+                w: -0.05 + 0.03 * HS,
                 p: -0.2,
-            };
+            }; 
             PD = {
                 r: -1 + 0.15 * HS,
-                b: -0.3,
-                w: -0.01 - 0.02 * HS,
-                p: 0.2 + 2* HS +  POSSIN,
+                b: -0.4+HS*.3,
+                w: -0.1 + 0.1 * HS,
+                p: 0.2 + 2 * HS + POSSIN,
             };
             rule(red, red, RD.r);
             rule(red, blue, RD.b);
@@ -183,71 +180,168 @@
             frameId = requestAnimationFrame(update);
         }
 
-         frameId = requestAnimationFrame(update);
+        frameId = requestAnimationFrame(update);
 
         return () => {
             cancelAnimationFrame(frameId);
         };
-    }
+    };
     onMount(setup);
 
     const lim = (o) =>
         typeof o === "object" && o !== null
             ? Object.fromEntries(Object.entries(o).map(([k, v]) => [k, lim(v)]))
             : Math.round(o * 100) / 100;
+    const restart = () => {
+        cancelAnimationFrame(frameId);
+        setup();
+    };
+    const reset = () => {
+        S = 550;
+        local = 70;
+        damp = 0.95;
+        margin = 5;
+    };
 </script>
 
-<div class="panel" use:draggable={{ handle }}>
-    <div bind:this={handle} >here</div>
-    <span>
-    <button on:click={()=>{  cancelAnimationFrame(frameId); setup()}}>redo</button>
-</span>
-<span>
-    FPS:{fps}
-</span>
-<span>
-    R:
-    {lim(ll)}
-    <input type=range bind:value={local} min=0 max=200 step=1>
-</span>
-<span>
-    S:
-    {lim(count)}
-    <input type=range bind:value={S} min=100 max=1000 step=10>
-</span>
-<span>
-    D:
-    {lim(dd)}
-    <input type=range bind:value={damp} min=-1 max=1 step=".025">
-</span>
-<span>
-    sin:
-    {lim(SIN)}
-</span>
+<button class:fade={HS>=.7}  class="setting" on:click={() => (showDebugger = true)} style={`animation-duration:${20+HS*5}s`}>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="feather feather-settings"
+        ><circle cx="12" cy="12" r="3" /><path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+        /></svg
+    >
+</button>
+{#if showDebugger}
+    <div class="panel" use:draggable={{ handle: ".handle" }}>
+        <div class="handle">
+            <h3>Debugger Panel</h3>
+            <button on:click={() => (showDebugger = false)}>X</button>
+        </div>
+        <div class="sub-panel">
+            <span style="text-align: center;">
+                FPS:{fps}
 
-<span>
-    cos:
-    {lim(COS)}
-</span>
-    <div class="sub-panel">
-        <span>
-            red : {JSON.stringify(lim(RD))}
-        </span>
-        <span>
-            white : {JSON.stringify(lim(WD))}
-        </span>
-        <span>
-            blue : {JSON.stringify(lim(BD))}
-        </span>
-        <span>
-            purple : {JSON.stringify(lim(PD))}
+                sin:
+                {lim(SIN)}
+
+                cos:
+                {lim(COS)}
+            </span>
+            <span>
+                <label for="R">
+                    Base Radius:
+                    {lim(ll)}
+                </label>
+                <input
+                    type="range"
+                    bind:value={local}
+                    min="0"
+                    max="200"
+                    step="1"
+                    name="R"
+                />
+            </span>
+            <span>
+                <label for="N">
+                    Num of particles:
+                    {lim(count)}
+                </label>
+                <input
+                    type="range"
+                    bind:value={S}
+                    min="100"
+                    max="1000"
+                    step="10"
+                    name="N"
+                />
+            </span>
+            <span>
+                <label for="D">
+                    Force Multiplier:
+                    {lim(dd)}
+                </label>
+                <input
+                    type="range"
+                    bind:value={damp}
+                    min="-1"
+                    max="3"
+                    step=".01"
+                    name="D"
+                />
+            </span>
+            <span>
+                <label for="M">
+                    Margin:
+                    {lim(margin)}
+                </label>
+                <input
+                    type="range"
+                    bind:value={margin}
+                    min="0"
+                    max={minDim / 2.1}
+                    step="1"
+                    name="M"
+                />
+            </span>
+
+            <span>
+                r : {JSON.stringify(lim(RD))}
+            </span>
+            <span>
+                w : {JSON.stringify(lim(WD))}
+            </span>
+            <span>
+                b : {JSON.stringify(lim(BD))}
+            </span>
+            <span>
+                p : {JSON.stringify(lim(PD))}
+            </span>
+        </div>
+        <span class="btns">
+            <button on:click={restart}>Restart</button>
+            <button on:click={reset}>Reset</button>
         </span>
     </div>
-</div>
+{/if}
 <!-- <svelte:window on:mousemove={handleMousemove} /> -->
 <canvas bind:this={canvas} />
 
 <style>
+    .setting {
+        position: fixed;
+        right: 5px;
+        bottom: 5px;
+        z-index: 20;
+        padding:0px;
+        margin:0px;
+        transition:.4s ease-in-out;
+        opacity:1;
+        animation: rotation 20s infinite linear;
+
+    }
+    .fade{
+        opacity:.25;
+        animation: rotation 40s infinite linear;
+
+    }
+    .setting:hover{
+        opacity:1 !important;
+    }
+    .setting {
+        background: none;
+        color: white;
+        stroke-width: 1.5;
+        border: none;
+    }
     canvas {
         position: absolute;
         top: 0px;
@@ -264,18 +358,66 @@
         right: 5px;
         z-index: 7;
         opacity: 1;
-        padding: 10px;
-        border-radius: 5px;
+        border-radius: 15px;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
-
+        background-color: rgba(0, 0, 0, 0.1);
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        backdrop-filter: blur(4px);
     }
     .sub-panel {
         padding: 5px;
-        background-color: rgba(255, 255, 255, 0.05);
         display: flex;
         flex-direction: column;
     }
     .sub-panel > span {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 5px;
     }
+    .handle {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 5px;
+        min-width: 100%;
+        text-align: center;
+        cursor: grab;
+        position: relative;
+    }
+    .handle:focus {
+        cursor: grabbing;
+    }
+    .btns {
+        flex-direction: row !important;
+        flex-wrap: nowrap;
+    }
+    .handle > button {
+        padding: 0px;
+        height: 20px;
+        width: 20px;
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translate3d(0, -10px, 0);
+        margin: 0px;
+        background: none;
+        border: none;
+        color: white;
+    }
+    .handle > h3 {
+        font-size: 1.1rem;
+    }
+    input[type="range"] {
+        margin-top: 6px;
+    }
+    @keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
 </style>
