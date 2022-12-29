@@ -3,7 +3,8 @@
 	import { onMount } from "svelte";
 	let h = 0;
 	let w = 0;
-	$: minD = Math.min(h, w);
+	$: SC = $Y / h;
+	$: in1 = Math.min(1, SC);
 
 	onMount(() => {
 		setTimeout(() => {
@@ -14,16 +15,20 @@
 </script>
 
 <svelte:window bind:innerHeight={h} bind:innerWidth={w} />
-<div class="blackout" class:shade={$Y / h > 0.5} />
+<div class="blackout" class:shade={SC > 0.5} />
 
 <section id="home">
 	<h1 class="mh">Hello World</h1>
 	<div
 		bind:this={titleContainer}
 		class="title-container anime"
-		style={`transform: translate3d(0%, -${
-			$Y / 2 - ($Y / h) * 50
-		}px, 0) scale(${1 + Math.min($Y / (h * 2), w > 600 ? 0.5 : 0.05)})`}
+		style={`transform: translate3d(0%, -${$Y / 2 - SC * 40}px, 0) scale(${
+			1 + Math.min(SC / 2, w > 600 ? 0.4 : 0.05)
+		});
+		color:rgba(${255 - 255 * SC},${255 - 255 * SC},${255 - 255 * SC},1);
+		background:rgba(255,255,255,${in1 - 0.2}) ;
+		
+		`}
 	>
 		<h2 class="title">I am Aparimeya</h2>
 	</div>
@@ -31,11 +36,58 @@
 		<a href="#about">scroll down :)</a>
 	</h4>
 </section>
-<section id="about">{minD}</section>
+<section id="about">
+	<article class:slideIn={SC > 0.8}>
+	<p>
+		Hi! I am Aparimeya
+	</p>
+	
+	
+	
+	</article>
+
+	<article class:slideIn={SC > 0.8}>me</article>
+	<article class:slideIn={SC > 0.8}>pix</article>
+</section>
 <section id="projects">projects</section>
 <section id="contact">contact</section>
 
 <style>
+	#about {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: 1fr 1fr;
+		grid-gap: 50px;
+		padding: 50px;
+		padding-top: 180px;
+	}
+	#about > article {
+		background: rgba(255, 255, 255, 0.1);
+		padding: 20px;
+		border-radius: 10px;
+		transition: 0.4s ease-in-out;
+		opacity: 0;
+		width: 100%;
+		height: 100%;
+
+	}
+	#about > article:nth-of-type(1){
+		transform: translate3d(-50px, 0px, 0);
+		grid-column: 1 / span 1;
+		grid-row: 1 / span 2;
+	}
+	#about > article:nth-of-type(2) {
+		transform: translate3d(50px, -50px, 0);
+		grid-column: 2 / span 1;
+		grid-row: 1 / span 1;
+	}
+	#about > article:nth-of-type(3) {
+		transform: translate3d(50px, 50px, 0);
+		grid-column: 2 / span 1;
+		grid-row: 2 / span 1;
+	}
+	
+
 	@keyframes fadeInAnimation {
 		0% {
 			opacity: 0;
@@ -51,14 +103,16 @@
 	}
 	.title-container {
 		position: fixed;
-		top: calc(50% + 2rem);
+		top: calc(50% + 2.5rem);
 		width: 345px;
 		transform: translate3d(0%, 0%, 0);
 		display: flex;
-		background: rgba(255, 255, 255, 0.7);
+		border: 2px solid;
 		justify-content: space-evenly;
 		padding: 0px 5px;
-		border-radius: 6px;
+		border-radius: 10px;
+		color: rgba(255, 255, 255, 1);
+		background: rgba(255, 255, 255, 0);
 	}
 	.anime {
 		animation: fadeInAnimation ease-in-out 0.66s;
@@ -68,9 +122,9 @@
 	.title {
 		text-align: center;
 		padding: 10px;
-		color: black;
-		letter-spacing: 4px;
+		letter-spacing: 6px;
 	}
+
 	.blackout {
 		height: 100dvh;
 		width: 100vw;
@@ -103,6 +157,10 @@
 		transform: translate3d(-50%, 0, 0);
 		transition: 0.4s ease-out;
 		animation: MoveUpDown 2s ease-in-out infinite;
+	}
+	.slideIn {
+		transform: translate3d(0px, 0px, 0) !important;
+		opacity: 1 !important;
 	}
 	.slide {
 		opacity: 0;

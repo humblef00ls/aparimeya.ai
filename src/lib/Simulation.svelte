@@ -3,23 +3,24 @@
     import { onMount } from "svelte";
     import { draggable } from "@neodrag/svelte";
     import { Y } from "$lib/store";
-
+    let paused = false;
     let showDebugger = false;
     let fps = 0;
-    let S = 500;
+    let S = 550;
     let count = 0;
-    let local = 85;
+    let local = 70;
     $: minDim = Math.min(w, h);
     let frameId = null;
-    $: ll = local + minDim / 100 + POSSIN + HS * 30;
+    $: ll = local + minDim / 100 + POSSIN + HS * 4;
     let damp = 0.95;
-    $: dd = damp - HS * 0.06 - 0.4 * POSSIN;
+    $: dd = damp - HS * 0.05 + 0.4 * POSSIN;
     $: HS = $Y / h;
     $: SIN = Math.sin((3.14 * $Y) / h);
     $: COS = Math.cos((3.14 * $Y) / h);
     $: POSSIN = Math.abs(SIN);
     $: POSCOS = Math.abs(COS);
     let margin = 5;
+    let scaleX;
     $: push = margin + Math.max(100, minDim / 4) * Math.abs(SIN);
     let [h, w] = [0, 0];
     const [R, W, B, P, BG] = ["red", "white", "cyan", "purple", "black"];
@@ -46,8 +47,8 @@
             return {
                 x: x,
                 y: y,
-                vx: 20 * Math.random() - 10,
-                vy: 20 * Math.random() - 10,
+                vx: 100 * Math.random() - 50,
+                vy: 100 * Math.random() - 50,
                 c: c,
                 s: s,
             };
@@ -112,12 +113,12 @@
             ctx.fillRect(x - s / 2, y - s / 2, s, s);
         };
 
-        const scaleX = Math.min(Math.min(h, w), S);
+        scaleX = Math.min(h, w) / 25 + S;
 
-        let white = create(scaleX * 2.5, W, 1);
-        let red = create(scaleX * 1.75, R, 2);
-        let blue = create(scaleX / 1, B, 3);
-        let purple = create(scaleX / 6, P, 4);
+        let white = create(scaleX * 2, W, 1);
+        let red = create(scaleX * 1.25, R, 2);
+        let blue = create(scaleX, B, 3);
+        let purple = create(scaleX / 7, P, 4);
         const times = [];
         count = points.length;
         function update() {
@@ -128,28 +129,28 @@
             times.push(now);
             fps = times.length;
             RD = {
-                r: 0.1 + -1 * POSSIN + 0.05 * HS,
+                r: 0.4 + 0.2 * COS + 0.05 * HS,
                 b: -1 - 0.23 * HS,
                 w: 0.2 - 0.09 * HS,
-                p: 0.4 - 0.2 * HS,
+                p: -0.64 - 0.09 * HS,
             };
             WD = {
-                r: -0.2 - 0.08 * HS,
-                b: 0.04 + 0.03 * HS,
+                r: 0.03 + 0.5 * COS,
+                b: 0.1 - 0.04 * HS,
                 w: 0.25 + POSSIN + 0.15 * COS,
-                p: -0.02 + 0.05 * HS,
+                p: -0.2 + 0.5 * HS,
             };
             BD = {
                 r: -0.2 - 0.1 * HS,
-                b: 0.5 + POSSIN - 0.025 * HS,
+                b: 0.15 + 0.33 * POSCOS + 0.02 * HS,
                 w: -0.07 + 0.05 * HS,
-                p: -0.2,
+                p: -0.6,
             };
             PD = {
                 r: -1 + 0.15 * HS,
                 b: -0.4 + HS * 0.075,
                 w: -0.1 + 0.1 * HS,
-                p: 0.2 + 0.5 * HS + POSSIN,
+                p: 1 + 1.25 * HS + POSSIN,
             };
             rule(red, red, RD.r);
             rule(red, blue, RD.b);
@@ -177,7 +178,7 @@
             }
 
             ctx.save();
-            frameId = requestAnimationFrame(update);
+            if (!paused) frameId = requestAnimationFrame(update);
         }
 
         frameId = requestAnimationFrame(update);
@@ -197,10 +198,13 @@
         setup();
     };
     const reset = () => {
-        S = 500;
-        local = 85;
+        S = 550;
+        local = 70;
         damp = 0.95;
         margin = 5;
+    };
+    const pause = () => {
+        paused = !paused;
     };
 </script>
 
@@ -240,6 +244,9 @@
 
                 cos:
                 {lim(COS)}
+
+                min:
+                {minDim / 25}
             </span>
             <span>
                 <label for="R">
@@ -313,6 +320,10 @@
         </div>
         <span class="btns">
             <button on:click={restart}>Restart</button>
+            <button on:click={pause}>
+                {#if paused} Resume {:else}Pause{/if}</button
+            >
+
             <button on:click={reset}>Reset</button>
         </span>
     </div>
