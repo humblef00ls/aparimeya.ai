@@ -1,9 +1,11 @@
 @import '@fontsource/fira-mono';
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Space+Mono:wght@400;700&display=swap');
 * {
 	box-sizing: border-box;
 	margin: 0 auto;
+	font-family: 'Didact Gothic', sans-serif;
+	letter-spacing: 1px;
+
 }
 
 :root {
@@ -41,7 +43,7 @@ h2,
 h3,
 h4 {
 	font-family: 'Space Mono', monospace;
-	letter-spacing: 2px;
+	letter-spacing: 1.25px;
 
 }
 
@@ -103,6 +105,7 @@ input[type="range"]::-moz-range-thumb {
 *::-webkit-scrollbar {
 	width: 4px;
 	height: 4px;
+	background: rgba(0, 0, 0, 0.25);
 }
 
 *::-webkit-scrollbar-track {
@@ -110,7 +113,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 *::-webkit-scrollbar-thumb {
-	background-color: white;
+	background: rgba(255, 255, 255, 0.5);
 }
 a{
 	color:white

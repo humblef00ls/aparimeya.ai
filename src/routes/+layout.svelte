@@ -71,12 +71,15 @@
 	header a {
 		text-decoration: none;
 		color: white;
+		font-family: 'Space Mono', monospace;
+font-weight: normal;
 	}
 	header h3 {
-		padding: 5px;
+		padding: 7px;
 		letter-spacing: 4px;
 		transition: ease-in-out 0.33s;
 		opacity: .575;
+		font-size: 1.4rem;
 	}
 	.slide {
 		transform: translate(0%, 0px);
