@@ -12,6 +12,7 @@
 		}, 680);
 	});
 	let titleContainer;
+	$: isM = w > 600
 </script>
 
 <svelte:window bind:innerHeight={h} bind:innerWidth={w} />
@@ -22,12 +23,13 @@
 	<div
 		bind:this={titleContainer}
 		class="title-container anime"
-		style={`transform: translate3d(0%, -${$Y / 2 - SC * 50}px, 0) scale(${
-			1 + Math.min(SC / 2, w > 600 ? 0.4 : 0.05)
-		});
+		style={`transform: translate3d(0%, -${
+			$Y / 2 - SC * (isM? 55 : -15)
+		}px, 0) scale(${1 + Math.min(SC / 2, isM ? 0.4 : 0.06)});
 		color:rgba(${255 - 255 * SC},${255 - 255 * SC},${255 - 255 * SC},1);
 		background:rgba(255,255,255,${in1 - 0.2}) ;
-		
+		border-radius: ${10 + 10 * in1}px;
+
 		`}
 	>
 		<h2 class="title">I am Aparimeya</h2>
@@ -53,8 +55,8 @@
 		</p>
 		<p>
 			I love AI, space, psychology, art, and most of all creating things!
-			In my free time I also sometimes try making IoT devices and EDM music
-			:)
+			In my free time I also sometimes try making IoT devices and EDM
+			music :)
 		</p>
 		<p>
 			Check out some of my featured projects and works <a href="#projects"
@@ -62,7 +64,8 @@
 			>, and feel free to reach out <a href="#contact">here</a>!
 		</p>
 		<p>
-			My goal is to leverage AI to build automations and develop apps that improve the lives of as many people as possible.
+			My goal is to leverage AI to build automations and develop apps that
+			improve the lives of as many people as possible.
 		</p>
 	</article>
 </section>
@@ -71,7 +74,7 @@
 
 <style>
 	.aboutMe {
-		padding: min(40px, max(3vw, 20px));
+		padding: 0px;
 	}
 	.aboutMe h1 {
 		font-size: 1.75rem;
@@ -98,24 +101,23 @@
 		padding-top: 210px;
 	}
 	#about > article {
-		background: rgba(255, 255, 255, 0.08);
-		border-radius: 20px;
 		transition: 0.4s ease-in-out;
 		opacity: 0;
 		width: min(100%, 550px);
 		max-height: 100%;
 		height: 100%;
-		overflow-y: auto;
+		overflow-y: scroll;
 		position: absolute;
 	}
 	#about > article:nth-of-type(1) {
+		border-radius: 20px;
 		transform: translate3d(-50px, 0px, 0);
 		grid-column: 1 / span 1;
 		grid-row: 1 / span 1;
 		padding: 0px;
 		overflow: hidden;
 		right: 0px;
-		filter:saturate(.75);
+		filter: saturate(0.7);
 	}
 	#about > article:nth-of-type(2) {
 		transform: translate3d(50px, 0px, 0);
@@ -201,15 +203,18 @@
 	.slideIn {
 		transform: translate3d(0px, 0px, 0) !important;
 		opacity: 0.875 !important;
-		-webkit-backdrop-filter: blur(5px);
-		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(0px);
+		backdrop-filter: blur(0px);
+	}
+	.slideIn:nth-of-type(2) {
+		opacity: 1 !important;
 	}
 	.slideIn:hover {
 		transform: translate3d(0px, 0px, 0) scale(1.025) !important;
 		opacity: 1 !important;
-
-		background: rgba(255, 255, 255, 0.0875) !important;
-		filter:saturate(1);
+		filter: saturate(1);
+		-webkit-backdrop-filter: blur(5px);
+		backdrop-filter: blur(5px);
 	}
 	.slide {
 		opacity: 0;
@@ -226,13 +231,13 @@
 			transform: translate(-50%, -15px);
 		}
 	}
-	@media only screen and (max-width: 750px) {
+	@media only screen and (max-width: 600px) {
 		#about {
 			grid-template-columns: 1fr;
-			grid-template-rows: 1fr 1.25fr;
-			grid-gap: 25px;
-			padding: 20px;
-			padding-top: 180px;
+			grid-template-rows: 1fr 1.4fr;
+			grid-gap: 30px;
+			padding: 30px;
+			padding-top: 110px;
 		}
 		.aboutMe h1 {
 			font-size: 1.5rem;
