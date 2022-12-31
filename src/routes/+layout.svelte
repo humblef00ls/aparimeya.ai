@@ -2,15 +2,23 @@
 	import "./styles.css";
 
 	import Simulation from "$lib/Simulation.svelte";
-	import { Y } from "$lib/store";
+	import { Y , R} from "$lib/store";
+    import { onMount } from "svelte";
 	let h = 0,w=0,
 		box;
 
 	const handleScroll = () => {
 		$Y = box.scrollTop;
+		$R = $Y / h
 	};
 
 	$: P = ($Y / h)+.4
+	let flag = false
+	onMount(()=>{
+		flag = true
+		$Y = box?.scrollTop ?? 0;
+		$R = $Y / h
+	})
 </script>
 
 <svelte:window bind:innerHeight={h} bind:innerWidth={w} />
@@ -19,6 +27,7 @@
 	<title>aparimeya.ai</title>
 	<meta name="description" content="Aparimeya Taneja's persoal website" />
 </svelte:head>
+{#if flag}
 <Simulation />
 <div class="app" bind:this={box} on:scroll={handleScroll} >
 	<header class:slide={$Y > h / 2}>
@@ -28,12 +37,75 @@
 		<h3 class:expand={P >= 1.99 && P < 3}><a href="#projects">projects</a></h3>
 		<h3 class:expand={P >= 2.99 && P < 4}><a href="#contact">contact</a></h3>
 		<h3 class:expand={P >= 3.99 && P < 5}><a href="/blog">blog</a></h3>
+		{:else}
+		<h3>MENU</h3>
 		{/if}
 	</header>
 	<slot />
 </div>
+{:else}
+<div class="loader">
 
+	<span class="dots" />
+	<span class="dots" />
+	<span class="dots" />
+	<span class="dots" />
+	<span class="dots" />
+	<span class="dots" />
+	<span class="dots" />
+	<span class="dots" />
+</div>
+
+{/if}
 <style>
+	.dots{
+		height:2px;
+		width:2px;
+		background: white;
+		position:absolute;
+	}
+	.dots:nth-last-of-type(1){
+		transform:translate3d(-14px,-14px,0)
+	}
+	.dots:nth-last-of-type(2){
+		transform:translate3d(-20px,0px,0)
+	}
+	.dots:nth-last-of-type(3){
+		transform:translate3d(0px,-20px,0)
+	}
+	.dots:nth-last-of-type(4){
+		transform:translate3d(0px,20px,0)
+	}
+	.dots:nth-last-of-type(5){
+		transform:translate3d(14px,14px,0)
+	}
+	.dots:nth-last-of-type(6){
+		transform:translate3d(20px,0px,0)
+	}
+	.dots:nth-last-of-type(7){
+		transform:translate3d(14px,-14px,0)
+	}
+	.dots:nth-last-of-type(8){
+		transform:translate3d(-14px,14px,0)
+	}
+
+	@keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
+    } 
+	.loader{
+		width:100vw;
+		position:relative;
+		height:100dvh;
+		animation: rotation 20s infinite linear;
+		display:flex;
+		justify-content: center;
+		align-items: center;
+	}
 	.expand,	header h3:hover {
 		transform: scale(1.2);
 		font-weight: bold;

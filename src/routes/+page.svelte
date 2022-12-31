@@ -1,35 +1,44 @@
 <script>
-	import { Y } from "$lib/store";
+	import { Y , R} from "$lib/store";
+	import Card from "$lib/Card.svelte";
 	import { onMount } from "svelte";
 	let h = 0;
 	let w = 0;
-	$: SC = $Y / h;
-	$: in1 = Math.min(1, SC);
+
+	let mobileOffset = 0.4;
+	
+	import projects from "$lib/projects.js";
+	let offSets = projects.map(_=> [Math.round(Math.random()*1000-500)/10,Math.round(Math.random()*1000-500)/10])
+	$: in1 = Math.min(1, $R);
 	import vert from "$lib/images/vert2.jpg";
 	onMount(() => {
+
 		setTimeout(() => {
 			titleContainer.classList.remove("anime");
 		}, 680);
+		offSets
 	});
 	let titleContainer;
-	$: isM = w > 600
+	$: isM = w > 600 ? 0.4 : 0.06;
+	$: isM2 = w > 600 ? 55 : -15;
+
+	let limP = true
 </script>
 
 <svelte:window bind:innerHeight={h} bind:innerWidth={w} />
-<div class="blackout" class:shade={SC > 0.5} />
+<div class="blackout" class:shade={$R > 0.5} />
 
 <section id="home">
 	<h1 class="mh">Hello World</h1>
 	<div
 		bind:this={titleContainer}
 		class="title-container anime"
-		style={`transform: translate3d(0%, -${
-			$Y / 2 - SC * (isM? 55 : -15)
-		}px, 0) scale(${1 + Math.min(SC / 2, isM ? 0.4 : 0.06)});
-		color:rgba(${255 - 255 * SC},${255 - 255 * SC},${255 - 255 * SC},1);
+		style={`transform: translate3d(0%, -${$Y / 2 - $R * isM2}px, 0) scale(${
+			1 + Math.min($R / 2, isM)
+		});
+		color:rgba(${255 - 255 * $R},${255 - 255 * $R},${255 - 255 * $R},1);
 		background:rgba(255,255,255,${in1 - 0.2}) ;
 		border-radius: ${10 + 10 * in1}px;
-
 		`}
 	>
 		<h2 class="title">I am Aparimeya</h2>
@@ -39,19 +48,20 @@
 	</h4>
 </section>
 <section id="about">
-	<article class:slideIn={SC > 0.7 && SC < 1.2}>
+	<article class:slideIn={$R > 0.7 && $R < 1.2}>
 		<img src={vert} />
 	</article>
 
-	<article class:slideIn={SC > 0.7 && SC < 1.2} class="aboutMe">
+	<article class:slideIn={$R > 0.7 && $R < 1.2} class="aboutMe">
 		<h1>
 			Hi! I'm a fullstack developer, UI/UX designer, digital artist, &
 			prompt engineer
 		</h1>
 
 		<p>
-			I make cool stuff at <a href="https://doordash.com">DoorDash</a> & am
-			currently based in the San Francisco Bay Area, CA.
+			After graduating from Duke, I am currently building cool stuff
+			at <a href="https://doordash.com">DoorDash</a>, & am based in the San
+			Francisco Bay Area, CA.
 		</p>
 		<p>
 			I love AI, space, psychology, art, and most of all creating things!
@@ -59,22 +69,55 @@
 			music :)
 		</p>
 		<p>
-			Check out some of my featured projects and works <a href="#projects"
-				>here</a
-			>, and feel free to reach out <a href="#contact">here</a>!
-		</p>
-		<p>
-			My goal is to leverage AI to build automations and develop apps that
-			improve the lives of as many people as possible.
+			Check out some of my <a href="#projects">featured projects</a>, and
+			feel free to <a href="#contact">reach out</a>!
 		</p>
 	</article>
 </section>
-<section id="projects">projects</section>
+<section id="projects" class:limiter={limP}>
+	{#each projects as P,i}
+		<Card {P} offSet={offSets[i]} />
+	{/each}
+	<button class="seeMore" class:slideUp={$R > 1.8 && $R <  2.1 }
+		on:click={()=>limP = !limP}
+		>{ limP ?  'See More' : 'Show Less' }</button>
+</section>
+
+
 <section id="contact">contact</section>
 
 <style>
+	.limiter{
+		overflow-y: hidden !important;
+	}
+	.seeMore{
+		padding:5px  15px;
+		border:2px solid white;
+		background: none;
+		color: white;
+		position: fixed;
+		bottom: 20px;
+		left: 50%;
+		transform: translate3d(-50%,25px,0);
+		opacity: 0;
+		transition: .3s ease-in-out;
+		font-family: 'Space Mono', monospace;
+	letter-spacing: 2px;
+	font-size: .95rem;
+
+	
+	}
+	.slideUp{
+		opacity: 1;
+		transform: translate3d(-50%,0px,0);
+
+	}
+
 	.aboutMe {
-		padding: 0px;
+		padding: 10px 20px;
+		background: rgba(150, 150, 150, 0.1);
+		backdrop-filter: blur(2px);
+		-webkit-backdrop-filter: blur(2px);
 	}
 	.aboutMe h1 {
 		font-size: 1.75rem;
@@ -107,10 +150,10 @@
 		max-height: 100%;
 		height: 100%;
 		overflow-y: scroll;
+		border-radius: 20px;
 		position: absolute;
 	}
 	#about > article:nth-of-type(1) {
-		border-radius: 20px;
 		transform: translate3d(-50px, 0px, 0);
 		grid-column: 1 / span 1;
 		grid-row: 1 / span 1;
@@ -203,11 +246,9 @@
 	.slideIn {
 		transform: translate3d(0px, 0px, 0) !important;
 		opacity: 0.875 !important;
-		-webkit-backdrop-filter: blur(0px);
-		backdrop-filter: blur(0px);
 	}
 	.slideIn:nth-of-type(2) {
-		opacity: 1 !important;
+		opacity: 0.95 !important;
 	}
 	.slideIn:hover {
 		transform: translate3d(0px, 0px, 0) scale(1.025) !important;
@@ -221,6 +262,20 @@
 		animation-play-state: paused;
 		transform: translate(-50%, 40px);
 	}
+	#projects {
+		flex-wrap: wrap;
+		display: flex;
+		gap: 25px 30px;
+		padding: 15px;
+		padding-top: 70px;
+		align-content: flex-start;
+		justify-content: center;
+		overflow-y: scroll;
+		max-height: 100%;
+		max-width: max(99vw,calc(100vw - 30px));
+		min-height: 95%;
+		overflow-x: hidden;
+	}
 
 	@keyframes MoveUpDown {
 		0%,
@@ -231,6 +286,7 @@
 			transform: translate(-50%, -15px);
 		}
 	}
+
 	@media only screen and (max-width: 600px) {
 		#about {
 			grid-template-columns: 1fr;

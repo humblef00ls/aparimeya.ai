@@ -28,7 +28,10 @@
     let WD = {};
     let BD = {};
     let PD = {};
-    const setup = () => {
+
+    let points = []
+    let [white, red, blue, purple] = [[],[],[],[]]
+    const setup = (keepPos = false) => {
         h = window.innerHeight;
         w = window.innerWidth;
 
@@ -42,7 +45,7 @@
         canvas.height = rect.height * dpr;
         ctx.scale(dpr, dpr);
 
-        let points = [];
+       
         const point = (x, y, c, s) => {
             return {
                 x: x,
@@ -115,10 +118,14 @@
 
         scaleX = Math.min(h, w) / 25 + S;
 
-        let white = create(scaleX * 2, W, 1);
-        let red = create(scaleX * 1.25, R, 2);
-        let blue = create(scaleX, B, 3);
-        let purple = create(scaleX / 7, P, 4);
+        if(!keepPos && white.length == 0){
+            points = [];
+         white = create(scaleX * 2, W, 1);
+         red = create(scaleX * 1.25, R, 2);
+         blue = create(scaleX, B, 3);
+         purple = create(scaleX / 7, P, 4);
+        }
+
         const times = [];
         count = points.length;
         function update() {
@@ -130,7 +137,7 @@
             fps = times.length;
             RD = {
                 r: 0.4 + 0.2 * COS + 0.05 * HS,
-                b: -1 - 0.23 * HS,
+                b: -1 - 0.23 * HS + 5*SIN,
                 w: 0.2 - 0.09 * HS,
                 p: -0.64 - 0.09 * HS,
             };
@@ -150,25 +157,26 @@
                 r: -1 + 0.15 * HS,
                 b: -0.4 + HS * 0.075,
                 w: -0.1 + 0.1 * HS,
-                p: 1 + 1.25 * HS + POSSIN,
+                p: 1 + 1.25 * HS + 4*POSSIN,
             };
-            rule(red, red, RD.r);
-            rule(red, blue, RD.b);
-            rule(red, white, RD.w);
-            rule(red, purple, RD.p);
-            rule(white, red, WD.r);
-            rule(white, blue, WD.b);
-            rule(white, white, WD.w);
-            rule(white, purple, WD.p);
-            rule(blue, white, BD.w);
-            rule(blue, red, BD.r);
-            rule(blue, blue, BD.b);
-            rule(blue, purple, BD.p);
-            rule(purple, white, PD.w);
-            rule(purple, purple, PD.p);
-            rule(purple, red, PD.r);
-            rule(purple, blue, PD.b);
-
+            if (!paused) {
+                rule(red, red, RD.r);
+                rule(red, blue, RD.b);
+                rule(red, white, RD.w);
+                rule(red, purple, RD.p);
+                rule(white, red, WD.r);
+                rule(white, blue, WD.b);
+                rule(white, white, WD.w);
+                rule(white, purple, WD.p);
+                rule(blue, white, BD.w);
+                rule(blue, red, BD.r);
+                rule(blue, blue, BD.b);
+                rule(blue, purple, BD.p);
+                rule(purple, white, PD.w);
+                rule(purple, purple, PD.p);
+                rule(purple, red, PD.r);
+                rule(purple, blue, PD.b);
+            }
             ctx.fillStyle = BG;
             ctx.fillRect(0, 0, w, h);
 
@@ -178,7 +186,7 @@
             }
 
             ctx.save();
-            if (!paused) frameId = requestAnimationFrame(update);
+            frameId = requestAnimationFrame(update);
         }
 
         frameId = requestAnimationFrame(update);
@@ -206,6 +214,11 @@
     const pause = () => {
         paused = !paused;
     };
+
+    const rezierX = () => {
+        cancelAnimationFrame(frameId);
+        setup(true)
+    }
 </script>
 
 <button
@@ -328,13 +341,13 @@
         </span>
     </div>
 {/if}
-<!-- <svelte:window on:mousemove={handleMousemove} /> -->
+<svelte:window on:resize={rezierX} />
 <canvas bind:this={canvas} />
 
 <style>
     .setting {
         position: fixed;
-        right: 5px;
+        left: 5px;
         bottom: 5px;
         z-index: 20;
         padding: 0px;
@@ -369,7 +382,7 @@
         color: white;
         position: fixed;
         bottom: 5px;
-        right: 5px;
+        left: 5px;
         z-index: 7;
         opacity: 1;
         border-radius: 15px;
@@ -381,6 +394,7 @@
         font-size: 0.75rem;
         -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
+        min-width: 300px;
     }
     .sub-panel {
         padding: 5px;
