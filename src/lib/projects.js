@@ -5,35 +5,43 @@ export default [
         img:""
     },
     {
-        title:"aparimeya.[???]",
-        skills:"FE"
+        title:"aparimeya.[_]",
+        skills:"FE",
+        img:"portfolio"
     },
     {
         title:"humblef00ls",
-        skills:"PS, AI"
+        skills:"PS, AI",
+        img:""
     },
     {
         title:"Intel ISEF",
-        skills:"Chemistry"
+        skills:"Research, Chemistry",
+        img:""
     },
     {
         title:"StockHub",
-        skills:"FE, BE"
+        skills:"FE, BE",
+        img:""
     },
     {
         title:"NAVIS",
-        skills:"FE, BE"
+        skills:"FE, BE",
+        img:""
     },
     {
         title:"Psychedelics",
-        skills:"FE"
+        skills:"FE",
+        img:""
     },
     {
         title:"DIDA",
-        skills:"FE, PS"
+        skills:"FE, PS",
+        img:""
     },
     {
         title:"HNRQ",
-        skills:"FE"
+        skills:"FE",
+        img:""
     },
 ]

@@ -74,13 +74,13 @@
 		</p>
 	</article>
 </section>
-<section id="projects" class:limiter={limP}>
-	{#each projects as P,i}
+<section id="projects" >
+	{#each projects.slice(0, limP ?  6 : 90) as P,i}
 		<Card {P} offSet={offSets[i]} />
 	{/each}
 	<button class="seeMore" class:slideUp={$R > 1.8 && $R <  2.1 }
 		on:click={()=>limP = !limP}
-		>{ limP ?  'See More' : 'Show Less' }</button>
+		>{ limP ?  'Show More' : 'Show Less' }</button>
 </section>
 
 
@@ -146,8 +146,8 @@
 	#about > article {
 		transition: 0.4s ease-in-out;
 		opacity: 0;
-		width: min(100%, 550px);
-		max-height: 100%;
+		width: min(100%,600px);
+		max-height:  min(100%, 800px);
 		height: 100%;
 		overflow-y: scroll;
 		border-radius: 20px;
@@ -268,6 +268,7 @@
 		gap: 25px 30px;
 		padding: 15px;
 		padding-top: 70px;
+		padding-bottom: 35px;
 		align-content: flex-start;
 		justify-content: center;
 		overflow-y: scroll;
