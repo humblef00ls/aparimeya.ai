@@ -6,7 +6,7 @@
     let paused = false;
     let showDebugger = false;
     let fps = 0;
-    let S = 550;
+    let S = 500;
     let count = 0;
     let local = 70;
     $: minDim = Math.min(w, h);
@@ -116,7 +116,7 @@
             ctx.fillRect(x - s / 2, y - s / 2, s, s);
         };
 
-        scaleX = Math.min(h, w) / 25 + S;
+        scaleX =  S;
 
         if(!keepPos && white.length == 0){
             points = [];
@@ -189,7 +189,7 @@
             frameId = requestAnimationFrame(update);
         }
 
-        frameId = requestAnimationFrame(update);
+        setTimeout(()=> frameId = requestAnimationFrame(update), 500)
 
         return () => {
             cancelAnimationFrame(frameId);

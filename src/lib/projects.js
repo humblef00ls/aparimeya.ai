@@ -7,7 +7,8 @@ export default [
     {
         title:"aparimeya.[_]",
         skills:"FE",
-        img:"portfolio"
+        img:"portfolio",
+        desc:`This webiste  <br>  Yes? first <a href='https://aparimeya.ai'> link </a> & second <a href='https://aparimeya.xyz'> likns</a>`,
     },
     {
         title:"humblef00ls",

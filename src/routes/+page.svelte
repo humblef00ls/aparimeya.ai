@@ -1,28 +1,32 @@
 <script>
-	import { Y , R} from "$lib/store";
+	import { Y, R } from "$lib/store";
 	import Card from "$lib/Card.svelte";
 	import { onMount } from "svelte";
 	let h = 0;
 	let w = 0;
-
+	let t = 0;
 	let mobileOffset = 0.4;
-	
+
 	import projects from "$lib/projects.js";
-	let offSets = projects.map(_=> [Math.round(Math.random()*1000-500)/10,Math.round(Math.random()*1000-500)/10])
+	let offSets = projects.map((_) => [
+		Math.round(Math.random() * 1000 - 500) / 10,
+		Math.round(Math.random() * 1000 - 500) / 10,
+	]);
 	$: in1 = Math.min(1, $R);
 	import vert from "$lib/images/vert2.jpg";
 	onMount(() => {
-
 		setTimeout(() => {
 			titleContainer.classList.remove("anime");
 		}, 680);
-		offSets
+
+		setInterval(() => (t = t + 0.003), 1);
+		offSets;
 	});
 	let titleContainer;
 	$: isM = w > 600 ? 0.4 : 0.06;
 	$: isM2 = w > 600 ? 55 : -15;
 
-	let limP = true
+	let limP = true;
 </script>
 
 <svelte:window bind:innerHeight={h} bind:innerWidth={w} />
@@ -59,9 +63,9 @@
 		</h1>
 
 		<p>
-			After graduating from Duke, I am currently building cool stuff
-			at <a href="https://doordash.com">DoorDash</a>, & am based in the San
-			Francisco Bay Area, CA.
+			After graduating from Duke, I am currently building cool stuff at <a
+				href="https://doordash.com">DoorDash</a
+			>, & am based in the San Francisco Bay Area, CA.
 		</p>
 		<p>
 			I love AI, space, psychology, art, and most of all creating things!
@@ -74,43 +78,91 @@
 		</p>
 	</article>
 </section>
-<section id="projects" >
-	{#each projects.slice(0, limP ?  6 : 90) as P,i}
+<section id="projects">
+	{#each projects.slice(0, limP ? 6 : 90) as P, i}
 		<Card {P} offSet={offSets[i]} />
 	{/each}
-	<button class="seeMore" class:slideUp={$R > 1.8 && $R <  2.1 }
-		on:click={()=>limP = !limP}
-		>{ limP ?  'Show More' : 'Show Less' }</button>
+	<button
+		class="seeMore"
+		class:slideUp={$R > 1.8 && $R < 2.1}
+		on:click={() => (limP = !limP)}
+		>{limP ? "Show More" : "Show Less"}</button
+	>
 </section>
 
-
-<section id="contact">contact</section>
+<section id="contact">
+	<span
+	class:fader={$R > 2.7}
+		class="icon "
+		style={`transform: translate3d(${
+			Math.cos(t + (1 / 5) * 3.14*2) * 100
+		}px,${Math.sin(t + (1 / 5) * 3.14*2) * 100}px,0)`}
+	/>
+	<span
+	class:fader={$R > 2.7}
+		class="icon "
+		style={`transform: translate3d(${
+			Math.cos(t + (2 / 5) * 3.14*2) * 100
+		}px,${Math.sin(t + (2 / 5) * 3.14*2) * 100}px,0)`}
+	/>
+	<span
+	class:fader={$R > 2.7}
+		class="icon "
+		style={`transform: translate3d(${
+			Math.cos(t + (3 / 5) * 3.14*2) * 100
+		}px,${Math.sin(t + (3 / 5) * 3.14*2) * 100}px,0)`}
+	/>
+	<span
+	class:fader={$R > 2.7}
+		class="icon "
+		style={`transform: translate3d(${
+			Math.cos(t + (4 / 5) * 3.14*2) * 100
+		}px,${Math.sin(t + (4 / 5) * 3.14*2) * 100}px,0)`}
+	/>
+	<span
+	class:fader={$R > 2.7}
+		class="icon "
+		style={`transform: translate3d(${
+			Math.cos(t + (5 / 5) * 3.14*2) * 100
+		}px,${Math.sin(t + (5 / 5) * 3.14*2) * 100}px,0)`}
+	/>
+</section>
 
 <style>
-	.limiter{
+	.icon {
+		height: 20px;
+		width: 20px;
+		background: red;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		opacity: 0;
+		transition: 0.3s ease-in-out;
+	}
+	.fader {
+		opacity: 1;
+	}
+	.limiter {
 		overflow-y: hidden !important;
 	}
-	.seeMore{
-		padding:5px  15px;
-		border:2px solid white;
+	.seeMore {
+		padding: 5px 15px;
+		border: 2px solid white;
 		background: none;
 		color: white;
 		position: fixed;
 		bottom: 20px;
 		left: 50%;
-		transform: translate3d(-50%,25px,0);
+		transform: translate3d(-50%, 25px, 0);
 		opacity: 0;
-		transition: .3s ease-in-out;
-		font-family: 'Space Mono', monospace;
-	letter-spacing: 2px;
-	font-size: .95rem;
-
-	
+		transition: 0.3s ease-in-out;
+		font-family: "Space Mono", monospace;
+		letter-spacing: 2px;
+		font-size: 0.95rem;
 	}
-	.slideUp{
+	.slideUp {
 		opacity: 1;
-		transform: translate3d(-50%,0px,0);
-
+		transform: translate3d(-50%, 0px, 0);
 	}
 
 	.aboutMe {
@@ -146,8 +198,8 @@
 	#about > article {
 		transition: 0.4s ease-in-out;
 		opacity: 0;
-		width: min(100%,600px);
-		max-height:  min(100%, 800px);
+		width: min(100%, 600px);
+		max-height: min(100%, 800px);
 		height: 100%;
 		overflow-y: scroll;
 		border-radius: 20px;
@@ -273,7 +325,7 @@
 		justify-content: center;
 		overflow-y: scroll;
 		max-height: 100%;
-		max-width: max(99vw,calc(100vw - 30px));
+		max-width: max(99vw, calc(100vw - 30px));
 		min-height: 95%;
 		overflow-x: hidden;
 	}

@@ -27,7 +27,10 @@
 >
     <div class="imgContainer">
         <img src={imgX} />
-        <p class="desc">facts</p>
+        <p class="desc">
+
+            {@html P.desc}
+        </p>
     </div>
     <div class="info">
         <h4>
@@ -44,8 +47,9 @@
         height: 100%;
         width: 100%;
         object-fit: cover;
-        transition: 1.5s cubic-bezier(0, 0, 0.36, 0.98);
+        transition: 1s ease-in-out;
         transform: scale(1.05);
+        opacity: 1;
     }
     .imgContainer {
         transition: 1s ease-in-out;
@@ -57,7 +61,7 @@
         
     }
     .desc {
-        transition: 0.75s ease-in-out;
+        transition: 1s ease-in-out;
         transform: translate3d(0px, 100%, 0);
         height: 100%;
         position: absolute;
@@ -65,10 +69,9 @@
         width: 100%;
         padding: 13px;
         overflow-y: scroll;
+        opacity: 0;
     }
-    .imgContainer:hover img {
-        transform: scale(1.5);
-    }
+
     .viz {
         opacity: 0.85;
         transform: translate3d(0px, 0px, 0) !important;
@@ -102,11 +105,12 @@
         opacity: 0.9;
     }
     :global(.BFC) .desc {
-        transition: 1.5s ease-in-out;
+        opacity: 1;
         transform: translate3d(0px, 0%, 0);
     }
     :global(.BFC) img {
         transform: translate3d(0px, -100%, 0) !important;
+        opacity: 0;
     }
     .viz:hover {
         opacity: 1 !important;
