@@ -2,23 +2,24 @@
 	import "./styles.css";
 
 	import Simulation from "$lib/Simulation.svelte";
-	import { Y , R} from "$lib/store";
-    import { onMount } from "svelte";
-	let h = 0,w=0,
+	import { Y, R } from "$lib/store";
+	import { onMount } from "svelte";
+	let h = 0,
+		w = 0,
 		box;
 
 	const handleScroll = () => {
 		$Y = box.scrollTop;
-		$R = $Y / h
+		$R = box.scrollTop / h;
 	};
 
-	$: P = ($Y / h)+.4
-	let flag = false
-	onMount(()=>{
-		flag = true
+	$: P = $Y / h + 0.4;
+	let flag = false;
+	onMount(() => {
+		flag = true;
 		$Y = box?.scrollTop ?? 0;
-		$R = $Y / h
-	})
+		$R = $Y / h;
+	});
 </script>
 
 <svelte:window bind:innerHeight={h} bind:innerWidth={w} />
@@ -28,88 +29,100 @@
 	<meta name="description" content="Aparimeya Taneja's persoal website" />
 </svelte:head>
 {#if flag}
-<Simulation />
-<div class="app" bind:this={box} on:scroll={handleScroll} >
-	<header class:slide={$Y > h / 2}>
-		{#if w >600}
-		<h3 class:expand={P >= 0 && P < 1}><a href="#home">home</a></h3>
-		<h3 class:expand={P >= 0.99 && P < 2}><a href="#about">about</a></h3>
-		<h3 class:expand={P >= 1.99 && P < 3}><a href="#projects">projects</a></h3>
-		<h3 class:expand={P >= 2.99 && P < 4}><a href="#contact">contact</a></h3>
-		<h3 class:expand={P >= 3.99 && P < 5}><a href="/blog">blog</a></h3>
-		{:else}
-		<h3>MENU</h3>
-		{/if}
-	</header>
-	<slot />
-</div>
+	<Simulation />
+	<div class="app" bind:this={box} on:scroll={handleScroll}>
+		<header class:slide={$Y > h / 2}>
+			{#if w > 600}
+				<h3 class:expand={P >= 0 && P < 1}><a href="#home">home</a></h3>
+				<h3 class:expand={P >= 0.99 && P < 2}>
+					<a href="#about">about</a>
+				</h3>
+				<h3 class:expand={P >= 1.99 && P < 3}>
+					<a href="#projects">projects</a>
+				</h3>
+				<h3 class:expand={P >= 2.99 && P < 4}>
+					<a href="#contact">contact</a>
+				</h3>
+				<h3 class:expand={P >= 3.99 && P < 5}>
+					<a
+						target="_blank"
+						rel="noreferrer"
+						href="https://aparimeya.medium.com/">blog</a
+					>
+				</h3>
+			{:else}
+				<h3>MENU</h3>
+			{/if}
+		</header>
+		<slot />
+	</div>
 {:else}
-<div class="loader">
-
-	<span class="dots" />
-	<span class="dots" />
-	<span class="dots" />
-	<span class="dots" />
-	<span class="dots" />
-	<span class="dots" />
-	<span class="dots" />
-	<span class="dots" />
-</div>
-
+	<div class="loader">
+		<span class="dots" />
+		<span class="dots" />
+		<span class="dots" />
+		<span class="dots" />
+		<span class="dots" />
+		<span class="dots" />
+		<span class="dots" />
+		<span class="dots" />
+	</div>
 {/if}
+
 <style>
-	.dots{
-		height:2px;
-		width:2px;
+	.dots {
+		height: 2px;
+		width: 2px;
 		background: white;
-		position:absolute;
+		position: absolute;
 	}
-	.dots:nth-last-of-type(1){
-		transform:translate3d(-14px,-14px,0)
+	.dots:nth-last-of-type(1) {
+		transform: translate3d(-14px, -14px, 0);
 	}
-	.dots:nth-last-of-type(2){
-		transform:translate3d(-20px,0px,0)
+	.dots:nth-last-of-type(2) {
+		transform: translate3d(-20px, 0px, 0);
 	}
-	.dots:nth-last-of-type(3){
-		transform:translate3d(0px,-20px,0)
+	.dots:nth-last-of-type(3) {
+		transform: translate3d(0px, -20px, 0);
 	}
-	.dots:nth-last-of-type(4){
-		transform:translate3d(0px,20px,0)
+	.dots:nth-last-of-type(4) {
+		transform: translate3d(0px, 20px, 0);
 	}
-	.dots:nth-last-of-type(5){
-		transform:translate3d(14px,14px,0)
+	.dots:nth-last-of-type(5) {
+		transform: translate3d(14px, 14px, 0);
 	}
-	.dots:nth-last-of-type(6){
-		transform:translate3d(20px,0px,0)
+	.dots:nth-last-of-type(6) {
+		transform: translate3d(20px, 0px, 0);
 	}
-	.dots:nth-last-of-type(7){
-		transform:translate3d(14px,-14px,0)
+	.dots:nth-last-of-type(7) {
+		transform: translate3d(14px, -14px, 0);
 	}
-	.dots:nth-last-of-type(8){
-		transform:translate3d(-14px,14px,0)
+	.dots:nth-last-of-type(8) {
+		transform: translate3d(-14px, 14px, 0);
 	}
 
 	@keyframes rotation {
-        from {
-            transform: rotate(0deg);
-        }
-        to {
-            transform: rotate(359deg);
-        }
-    } 
-	.loader{
-		width:100vw;
-		position:relative;
-		height:100dvh;
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(359deg);
+		}
+	}
+	.loader {
+		width: 100vw;
+		position: relative;
+		height: 100dvh;
 		animation: rotation 20s infinite linear;
-		display:flex;
+		display: flex;
 		justify-content: center;
 		align-items: center;
 	}
-	.expand,	header h3:hover {
+	.expand,
+	header h3:hover {
 		transform: scale(1.2);
 		font-weight: bold;
-		opacity:1
+		opacity: 1;
 	}
 	.app {
 		display: flex;
@@ -117,10 +130,12 @@
 		scroll-snap-type: y mandatory;
 		overflow: auto;
 		overflow-x: hidden;
+		min-height: 100dvh;
+		max-height: 100dvh;
 		height: 100dvh;
+
 		scroll-behavior: smooth;
 		max-width: 100vw;
-
 	}
 
 	header {
@@ -143,14 +158,14 @@
 	header a {
 		text-decoration: none;
 		color: white;
-		font-family: 'Space Mono', monospace;
-font-weight: normal;
+		font-family: "Space Mono", monospace;
+		font-weight: normal;
 	}
 	header h3 {
 		padding: 7px;
 		letter-spacing: 4px;
 		transition: ease-in-out 0.33s;
-		opacity: .575;
+		opacity: 0.575;
 		font-size: 1.4rem;
 	}
 	.slide {

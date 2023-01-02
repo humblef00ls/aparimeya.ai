@@ -8,6 +8,7 @@
     let fps = 0;
     let S = 500;
     let count = 0;
+    let scaler = 2;
     let local = 70;
     $: minDim = Math.min(w, h);
     let frameId = null;
@@ -29,8 +30,8 @@
     let BD = {};
     let PD = {};
 
-    let points = []
-    let [white, red, blue, purple] = [[],[],[],[]]
+    let points = [];
+    let [white, red, blue, purple] = [[], [], [], []];
     const setup = (keepPos = false) => {
         h = window.innerHeight;
         w = window.innerWidth;
@@ -45,7 +46,6 @@
         canvas.height = rect.height * dpr;
         ctx.scale(dpr, dpr);
 
-       
         const point = (x, y, c, s) => {
             return {
                 x: x,
@@ -88,9 +88,9 @@
                         fy += F * dy;
                     }
                 }
-                const scaler = Math.max(a.s * damp, 1);
-                a.vx = (a.vx / scaler + fx) * 0.5;
-                a.vy = (a.vy / scaler + fy) * 0.5;
+
+                a.vx = (a.vx / (scaler + a.s) + fx) * 0.5;
+                a.vy = (a.vy / (scaler + a.s) + fy) * 0.5;
 
                 a.x += a.vx;
                 a.y += a.vy;
@@ -109,25 +109,25 @@
                 }
             }
         };
-        canvas.style.opacity = 1;
 
         const draw = (x, y, c, s) => {
             ctx.fillStyle = c;
             ctx.fillRect(x - s / 2, y - s / 2, s, s);
         };
 
-        scaleX =  S;
+        scaleX = S;
 
-        if(!keepPos && white.length == 0){
+        if (!keepPos && white.length == 0) {
             points = [];
-         white = create(scaleX * 2, W, 1);
-         red = create(scaleX * 1.25, R, 2);
-         blue = create(scaleX, B, 3);
-         purple = create(scaleX / 7, P, 4);
+            white = create(scaleX * 2, W, 1);
+            red = create(scaleX * 1.25, R, 2);
+            blue = create(scaleX, B, 3);
+            purple = create(scaleX / 7, P, 4);
         }
 
         const times = [];
         count = points.length;
+
         function update() {
             const now = performance.now();
             while (times.length > 0 && times[0] <= now - 1000) {
@@ -136,9 +136,9 @@
             times.push(now);
             fps = times.length;
             RD = {
-                r: 0.4 + 0.2 * COS + 0.05 * HS,
-                b: -1 - 0.23 * HS + 5*SIN,
-                w: 0.2 - 0.09 * HS,
+                r: 0.4 + 0.2 * COS + 0.09 * HS,
+                b: -1 - 0.23 * HS + 5 * SIN,
+                w: 0.2 - 0.07 * HS,
                 p: -0.64 - 0.09 * HS,
             };
             WD = {
@@ -157,7 +157,7 @@
                 r: -1 + 0.15 * HS,
                 b: -0.4 + HS * 0.075,
                 w: -0.1 + 0.1 * HS,
-                p: 1 + 1.25 * HS + 4*POSSIN,
+                p: 1 + 1.25 * HS + 4 * POSSIN,
             };
             if (!paused) {
                 rule(red, red, RD.r);
@@ -186,10 +186,10 @@
             }
 
             ctx.save();
-            frameId = requestAnimationFrame(update);
+            setTimeout(() => (frameId = requestAnimationFrame(update)), 0);
         }
-
-        setTimeout(()=> frameId = requestAnimationFrame(update), 500)
+        setTimeout(() => (canvas.style.opacity = 1), 500);
+        frameId = requestAnimationFrame(update);
 
         return () => {
             cancelAnimationFrame(frameId);
@@ -206,7 +206,7 @@
         setup();
     };
     const reset = () => {
-        S = 550;
+        S = 500;
         local = 70;
         damp = 0.95;
         margin = 5;
@@ -217,8 +217,8 @@
 
     const rezierX = () => {
         cancelAnimationFrame(frameId);
-        setup(true)
-    }
+        setup(true);
+    };
 </script>
 
 <button
@@ -347,8 +347,8 @@
 <style>
     .setting {
         position: fixed;
-        left: 5px;
-        bottom: 5px;
+        left: 15px;
+        bottom: 15px;
         z-index: 20;
         padding: 0px;
         margin: 0px;
@@ -358,6 +358,8 @@
     }
     .fade {
         opacity: 0.25;
+        left: 5px;
+        bottom: 5px;
         animation: rotation 40s infinite linear;
     }
     .setting:hover {
@@ -376,7 +378,7 @@
         height: 100%;
         z-index: 0;
         opacity: 0;
-        transition: 0.3s ease-in;
+        transition: opacity 1s cubic-bezier(0.37, 1.1, 0.46, 0.89);
     }
     .panel {
         color: white;
