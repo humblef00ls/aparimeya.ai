@@ -56,6 +56,7 @@
         width: 100%;
         height: calc(100% - 80px);
         opacity: 0.4;
+        filter:saturate(.75);
         overflow: hidden;
         position: relative;
         
@@ -67,7 +68,7 @@
         position: absolute;
         top: 0px;
         width: 100%;
-        padding: 13px;
+        padding: 15px;
         overflow-y: scroll;
         opacity: 0;
     }
@@ -75,9 +76,6 @@
     .viz {
         opacity: 0.85;
         transform: translate3d(0px, 0px, 0) !important;
-    }
-    .viz:hover .imgContainer {
-        opacity: 0.7 !important;
     }
     article {
         transition: 0.475s ease-in-out;
@@ -101,8 +99,15 @@
         backdrop-filter: blur(5px) !important;
         -webkit-backdrop-filter: blur(5px) !important;
     }
+    .viz:hover {
+        opacity: 1 !important;
+        transform: translate3d(0px, 0px, 0) scale(1.05) !important;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
     :global(.BFC) .imgContainer {
-        opacity: 0.9;
+        opacity: 1 !important;
+        filter:saturate(1);
     }
     :global(.BFC) .desc {
         opacity: 1;
@@ -112,12 +117,7 @@
         transform: translate3d(0px, -100%, 0) !important;
         opacity: 0;
     }
-    .viz:hover {
-        opacity: 1 !important;
-        transform: translate3d(0px, 0px, 0) scale(1.05) !important;
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-    }
+
     h4 {
         font-size: 1.25rem;
     }
@@ -129,5 +129,10 @@
         background: rgba(255, 255, 255, 0.075);
         width: 100%;
         height: 80px;
+    }
+
+    .viz:hover .imgContainer {
+        opacity: 0.7 ;
+        filter:saturate(1);
     }
 </style>

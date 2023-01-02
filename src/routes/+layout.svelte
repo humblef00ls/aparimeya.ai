@@ -26,8 +26,15 @@
 <svelte:window bind:innerHeight={h} bind:innerWidth={w} />
 
 <svelte:head>
-	<title>aparimeya.ai</title>
-	<meta name="description" content="Aparimeya Taneja's persoal website" />
+	<title>aparimeya</title>
+	<meta name="description" content="This website is a portfolio detailing all my projects and experiences. Learn more about me and contact me here! -aparimeya">
+	<meta name="keywords" content="Aparimeya Taneja, Aparimeya, aparimeya.ai, web dev, portfolio, profile">
+	<meta name="author" content="Aparimeya Taneja">
+	<meta property="og:title" content="Aparimeya Taneja" />
+	<meta property="og:url" content="https://aparimeya.ai" />
+	<meta property="og:type" content="website" />
+	<meta property="og:description" content="This website is a portfolio detailing all my projects and experiences. Learn more about me and contact me here! -aparimeya" />
+	<meta property="og:image" content="https://aparimeya.ai/OGBG.png" />
 </svelte:head>
 {#if flag}
 	<Simulation />
