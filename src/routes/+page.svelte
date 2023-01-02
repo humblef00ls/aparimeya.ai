@@ -6,8 +6,8 @@
 	let w = 0;
 	let t = 0;
 	let sizer = 60;
-	let mobileOffset = 0.4;
 	let RadB = 130;
+	import PDFx from "$lib/Aparimeya_Resume.pdf";
 	import projects from "$lib/projects.js";
 	let offSets = projects.map((_) => [
 		Math.round(Math.random() * 1000 - 500) / 10,
@@ -24,7 +24,7 @@
 		offSets;
 	});
 	let titleContainer;
-	$: isM = w > 600 ? 0.4 : 0.06;
+	$: isM = w > 600 ? 0.4 : 0;
 	let limP = true;
 	$: MD = Math.min(h, w);
 	$: Rad = Math.max(MD / 4, RadB);
@@ -250,19 +250,37 @@
 				>
 			</span>
 		</a>
+		<a class="resume" href={PDFx}>resume</a>
 	</div>
-	<a class="resume">RESUME</a>
 </section>
 
 <style>
 	.resume {
 		position: absolute;
-
+		letter-spacing: 5px;
+		padding: 15px 25px;
+		backdrop-filter: blur(3px);
+		-webkit-backdrop-filter: blur(3px);
+		border-radius: 10px;
+		text-decoration: none;
+		background: rgba(235, 235, 235, 0.1);
+		left: 50%;
+		top: 50%;
+		transform: translate3d(-50%, -50%, 0);
+		font-family: "Space Mono", monospace;
+		font-weight: 100;
+		transition:  0.5s ease-in-out;
+		opacity: .9;
+	}
+	.resume:hover{
+		transform: translate3d(-50%, -50%, 0) scale(1.2);
+		opacity: 1;
 	}
 	.cont {
-		scale: 1.9;
+		scale: 1.75;
 		opacity: 0;
 		transition: 1.2s cubic-bezier(0.37, 1.1, 0.46, 0.89);
+		width: 100%;
 	}
 	.zoomed {
 		opacity: 1 !important;
@@ -272,7 +290,7 @@
 		height: 60px;
 		width: 60px;
 		border-radius: 10px;
-		background: rgba(235, 235, 235, 0.125);
+		background: rgba(235, 235, 235, 0.1);
 		position: absolute;
 		left: 50%;
 		top: 50%;

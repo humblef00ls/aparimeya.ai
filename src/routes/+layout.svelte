@@ -4,6 +4,7 @@
 	import Simulation from "$lib/Simulation.svelte";
 	import { Y, R } from "$lib/store";
 	import { onMount } from "svelte";
+	let show = false
 	let h = 0,
 		w = 0,
 		box;
@@ -30,6 +31,15 @@
 </svelte:head>
 {#if flag}
 	<Simulation />
+	<nav class:show>
+		<h1 on:click={()=>show = false}>x</h1>
+		<a  href="#about" on:click={()=>show = false}>about</a>
+		<a  href="#projects" on:click={()=>show = false}>projects</a>
+		<a  href="#contact" on:click={()=>show = false}>contact</a>
+		<a target="_blank"
+		rel="noreferrer"
+		href="https://aparimeya.medium.com/" on:click={()=>show = false}>blog</a>
+	</nav>
 	<div class="app" bind:this={box} on:scroll={handleScroll}>
 		<header class:slide={$Y > h / 2}>
 			{#if w > 600}
@@ -51,7 +61,7 @@
 					>
 				</h3>
 			{:else}
-				<h3>MENU</h3>
+				<h3 class="HM" on:click={()=>show = true}>menu</h3>
 			{/if}
 		</header>
 		<slot />
@@ -70,6 +80,40 @@
 {/if}
 
 <style>
+	nav{
+		transform: translate3d(0%,-100%,0);
+		height: 100dvh;
+		width: 100vw;
+		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(5px);
+		background: rgba(5, 5, 5, 0.2);
+		position: fixed;
+		transition: ease-out 0.5s;
+		z-index: 20;
+		opacity: 0;
+	}
+	nav h1, nav a{
+		color: white;
+		width: 100%;
+		padding: 20px;
+		text-align: center;
+		font-weight: lighter;
+		font-size: 2rem;
+		display: block;
+		font-family: "Space Mono", monospace;
+		letter-spacing: 3px;
+		cursor: pointer;
+	}
+
+
+	.show{
+		transform: translate3d(0%,0%,0);
+		opacity: 1;
+	}
+	.HM{
+		padding-top: 16px !important;
+		cursor: pointer;
+	}
 	.dots {
 		height: 2px;
 		width: 2px;
