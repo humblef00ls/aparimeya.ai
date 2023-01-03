@@ -1,0 +1,454 @@
+<script>
+    let canvas;
+    import { onMount } from "svelte";
+    import { draggable } from "@neodrag/svelte";
+    import { Y } from "$lib/store";
+    let paused = false;
+    let showDebugger = false;
+    let fps = 0;
+    let S = 500;
+    let count = 0;
+    let scaler = 2;
+    let local = 70;
+    $: minDim = Math.min(w, h);
+    let frameId = null;
+    $: ll = local + minDim / 100 + POSSIN + HS * 4;
+    let damp = 0.95;
+    $: dd = damp - HS * 0.05 + 0.4 * POSSIN;
+    $: HS = $Y / h;
+    $: SIN = Math.sin((3.14 * $Y) / h);
+    $: COS = Math.cos((3.14 * $Y) / h);
+    $: POSSIN = Math.abs(SIN);
+    $: POSCOS = Math.abs(COS);
+    let margin = 5;
+    let scaleX;
+    $: push = margin + Math.max(100, minDim / 4) * Math.abs(SIN);
+    let [h, w] = [0, 0];
+    const [R, W, B, P, BG] = ["red", "white", "cyan", "purple", "black"];
+    let RD = {};
+    let WD = {};
+    let BD = {};
+    let PD = {};
+
+    let points = [];
+    let [white, red, blue, purple] = [[], [], [], []];
+    const setup = (keepPos = false) => {
+        h = window.innerHeight;
+        w = window.innerWidth;
+
+        canvas.height = h;
+        canvas.width = w;
+
+        const ctx = canvas.getContext("2d", { alpha: false });
+        const dpr = window.devicePixelRatio;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+
+        const point = (x, y, c, s) => {
+            return {
+                x: x,
+                y: y,
+                vx: 100 * Math.random() - 50,
+                vy: 100 * Math.random() - 50,
+                c: c,
+                s: s,
+            };
+        };
+        const create = (n, c, s = 3.5) => {
+            let group = [];
+            for (let i = 0; i < n; i++) {
+                group.push(
+                    point(
+                        Math.random() * (w - 100) + 50,
+                        Math.random() * (h - 100) + 50,
+                        c,
+                        Math.random() * 0.5 + s
+                    )
+                );
+                points.push(group[i]);
+            }
+            return group;
+        };
+        const rule = (atoms1, atoms2, g) => {
+            for (let i = 0; i < atoms1.length; i++) {
+                let fx = 0;
+                let fy = 0;
+                let a = atoms1[i];
+                for (let j = 0; j < atoms2.length; j++) {
+                    let b = atoms2[j];
+                    let dx = a.x - b.x;
+                    let dy = a.y - b.y;
+                    let d = Math.sqrt(dx * dx + dy * dy);
+                    if (d > 0 && d < ll + b.s * b.s) {
+                        let F = (g * 1) / d;
+                        F = F * dd;
+                        fx += F * dx;
+                        fy += F * dy;
+                    }
+                }
+
+                a.vx = (a.vx / (scaler + a.s) + fx) * 0.5;
+                a.vy = (a.vy / (scaler + a.s) + fy) * 0.5;
+
+                a.x += a.vx;
+                a.y += a.vy;
+                if (a.x < margin) {
+                    a.vx = a.vx + push;
+                    a.x = margin;
+                } else if (a.x > w - margin) {
+                    a.vx = a.vx - push;
+                    a.x = w - margin;
+                } else if (a.y < margin) {
+                    a.vy = a.vy + push;
+                    a.y = margin;
+                } else if (a.y > h - margin) {
+                    a.vy = a.vy - push;
+                    a.y = h - margin;
+                }
+            }
+        };
+
+        const draw = (x, y, c, s) => {
+            ctx.fillStyle = c;
+            ctx.fillRect(x - s / 2, y - s / 2, s, s);
+        };
+
+        scaleX = S;
+
+        if (!keepPos && white.length == 0) {
+            points = [];
+            white = create(scaleX * 2, W, 1);
+            red = create(scaleX * 1.25, R, 2);
+            blue = create(scaleX, B, 3);
+            purple = create(scaleX / 7, P, 4);
+        }
+
+        const times = [];
+        count = points.length;
+
+        function update() {
+            const now = performance.now();
+            while (times.length > 0 && times[0] <= now - 1000) {
+                times.shift();
+            }
+            times.push(now);
+            fps = times.length;
+            RD = {
+                r: 0.4 + 0.2 * COS + 0.09 * HS,
+                b: -1 - 0.23 * HS + 5 * SIN,
+                w: 0.2 - 0.07 * HS,
+                p: -0.64 - 0.09 * HS,
+            };
+            WD = {
+                r: 0.03 + 0.5 * COS,
+                b: 0.12 - 0.09 * HS,
+                w: 0.25 + POSSIN + 0.15 * COS,
+                p: -0.2 + 0.5 * HS,
+            };
+            BD = {
+                r: -0.2 - 0.1 * HS,
+                b: 0.15 + 0.33 * POSCOS + 0.02 * HS,
+                w: -0.07 + 0.05 * HS,
+                p: -0.6,
+            };
+            PD = {
+                r: -1 + 0.15 * HS,
+                b: -0.4 + HS * 0.075,
+                w: -0.1 + 0.1 * HS,
+                p: 1 + 1.25 * HS + 4 * POSSIN,
+            };
+            if (!paused) {
+                rule(red, red, RD.r);
+                rule(red, blue, RD.b);
+                rule(red, white, RD.w);
+                rule(red, purple, RD.p);
+                rule(white, red, WD.r);
+                rule(white, blue, WD.b);
+                rule(white, white, WD.w);
+                rule(white, purple, WD.p);
+                rule(blue, white, BD.w);
+                rule(blue, red, BD.r);
+                rule(blue, blue, BD.b);
+                rule(blue, purple, BD.p);
+                rule(purple, white, PD.w);
+                rule(purple, purple, PD.p);
+                rule(purple, red, PD.r);
+                rule(purple, blue, PD.b);
+            }
+            ctx.fillStyle = BG;
+            ctx.fillRect(0, 0, w, h);
+
+            for (let i = 0; i < points.length; i++) {
+                const p = points[i];
+                draw(p.x, p.y, p.c, p.s);
+            }
+
+            ctx.save();
+            setTimeout(() => (frameId = requestAnimationFrame(update)), 0);
+        }
+        setTimeout(() => (canvas.style.opacity = 1), 500);
+        frameId = requestAnimationFrame(update);
+
+        return () => {
+            cancelAnimationFrame(frameId);
+        };
+    };
+    onMount(setup);
+
+    const lim = (o) =>
+        typeof o === "object" && o !== null
+            ? Object.fromEntries(Object.entries(o).map(([k, v]) => [k, lim(v)]))
+            : Math.round(o * 100) / 100;
+    const restart = () => {
+        cancelAnimationFrame(frameId);
+        setup();
+    };
+    const reset = () => {
+        S = 500;
+        local = 70;
+        damp = 0.95;
+        margin = 5;
+    };
+    const pause = () => {
+        paused = !paused;
+    };
+
+    const rezierX = () => {
+        cancelAnimationFrame(frameId);
+        setup(true);
+    };
+</script>
+
+<button
+    class:fade={HS >= 0.7}
+    class="setting"
+    on:click={() => (showDebugger = true)}
+    style={`animation-duration:${20 + HS * 5}s`}
+>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="feather feather-settings"
+        ><circle cx="12" cy="12" r="3" /><path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+        /></svg
+    >
+</button>
+{#if showDebugger}
+    <div class="panel" use:draggable={{ handle: ".handle" }}>
+        <div class="handle">
+            <h3>Debugger Panel</h3>
+            <button on:click={() => (showDebugger = false)}>X</button>
+        </div>
+        <div class="sub-panel">
+            <span style="text-align: center;">
+                FPS:{fps}
+
+                sin:
+                {lim(SIN)}
+
+                cos:
+                {lim(COS)}
+
+                min:
+                {minDim / 25}
+            </span>
+            <span>
+                <label for="R">
+                    Base Radius:
+                    {lim(ll)}
+                </label>
+                <input
+                    type="range"
+                    bind:value={local}
+                    min="0"
+                    max="200"
+                    step="1"
+                    name="R"
+                />
+            </span>
+            <span>
+                <label for="N">
+                    Num of particles:
+                    {lim(count)}
+                </label>
+                <input
+                    type="range"
+                    bind:value={S}
+                    min="100"
+                    max="1000"
+                    step="10"
+                    name="N"
+                />
+            </span>
+            <span>
+                <label for="D">
+                    Force Multiplier:
+                    {lim(dd)}
+                </label>
+                <input
+                    type="range"
+                    bind:value={damp}
+                    min="-1"
+                    max="3"
+                    step=".01"
+                    name="D"
+                />
+            </span>
+            <span>
+                <label for="M">
+                    Margin:
+                    {lim(margin)}
+                </label>
+                <input
+                    type="range"
+                    bind:value={margin}
+                    min="0"
+                    max={minDim / 2.1}
+                    step="1"
+                    name="M"
+                />
+            </span>
+
+            <span>
+                r : {JSON.stringify(lim(RD))}
+            </span>
+            <span>
+                w : {JSON.stringify(lim(WD))}
+            </span>
+            <span>
+                b : {JSON.stringify(lim(BD))}
+            </span>
+            <span>
+                p : {JSON.stringify(lim(PD))}
+            </span>
+        </div>
+        <span class="btns">
+            <button on:click={restart}>Restart</button>
+            <button on:click={pause}>
+                {#if paused} Resume {:else}Pause{/if}</button
+            >
+
+            <button on:click={reset}>Reset</button>
+        </span>
+    </div>
+{/if}
+<svelte:window on:resize={rezierX} />
+<canvas bind:this={canvas} />
+
+<style>
+    .setting {
+        position: fixed;
+        left: 15px;
+        bottom: 15px;
+        z-index: 20;
+        padding: 0px;
+        margin: 0px;
+        transition: 0.4s ease-in-out;
+        opacity: 1;
+        animation: rotation 20s infinite linear;
+    }
+    .fade {
+        opacity: 0.25;
+        left: 5px;
+        bottom: 5px;
+        animation: rotation 40s infinite linear;
+    }
+    .setting:hover {
+        opacity: 1 !important;
+    }
+    .setting {
+        background: none;
+        color: white;
+        stroke-width: 1.5;
+        border: none;
+    }
+    canvas {
+        position: absolute;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        opacity: 0;
+        transition: opacity 1s cubic-bezier(0.37, 1.1, 0.46, 0.89);
+    }
+    .panel {
+        color: white;
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 7;
+        opacity: 1;
+        border-radius: 15px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background-color: rgba(0, 0, 0, 0.1);
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        min-width: 300px;
+    }
+    .sub-panel {
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+    }
+    .sub-panel > span {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 5px;
+    }
+    .handle {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 5px;
+        min-width: 100%;
+        text-align: center;
+        cursor: grab;
+        position: relative;
+    }
+    .handle:focus {
+        cursor: grabbing;
+    }
+    .btns {
+        flex-direction: row !important;
+        flex-wrap: nowrap;
+    }
+    .handle > button {
+        padding: 0px;
+        height: 20px;
+        width: 20px;
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translate3d(0, -10px, 0);
+        margin: 0px;
+        background: none;
+        border: none;
+        color: white;
+    }
+    .handle > h3 {
+        font-size: 1.1rem;
+    }
+    input[type="range"] {
+        margin-top: 6px;
+    }
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(359deg);
+        }
+    }
+</style>
