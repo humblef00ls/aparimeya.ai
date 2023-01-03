@@ -8,7 +8,8 @@ export default [
         on cross team projects to enable downstream dependencies.
         <br><br>
         Apart from my expected tasks, I also took the initiative to launch a project that leverages Large Language Models like GPT-3 to save us 2 - 3
-        million USD per year in offshore BPO vendor costs, as well as improve our catalog data significantly.`,
+        million USD per year in offshore BPO vendor costs, as well as improve our catalog data significantly.
+        <br><br> Primarily, I work with Kotlin, Python and TypeScript code bases.`,
     },
     {
         title: "aparimeya.[_]",
@@ -44,26 +45,45 @@ export default [
     {
         title: "StockHub",
         skills: "FE, BE",
-        img: ""
+        img: "stockhub",
+        desc: ` <a href='https://stockhub.app'>StockHub</a> is a free to use PWA that tracks daily tweets and Reddit posts for 8000 US securities, as well as options volume data for 530 stocks every 5 minutes. It helps track short term trends in the market and thus helps retail investors with more information.
+        <br><br>
+        I built it over the summer of 2020, after I saw some bizzare market movements and was curious to find out more. One thing led to another and I decided that building StockHub would be a great way to identify such behaviour and also help out all the retial investors I saw online who were trying to chase long term porfits with short term trends. It also runs NLP on each tweet and Reddit post to generate an average sentiment score for every stock, based on social mentions from the previous day.
+        <br><br>
+        It is built using Svelte/Sapper for the frontend, and GCP serverless for backend (interact with private APIs). More info and a diagram here.
+        <br><br>
+        Technologies used: Svelte, Sapper, GCP (Functions, Run, Scheduler, PubSub), Python, JavaScript, Node, Docker, Firebase (RTDB, Hosting, Analytics). 
+        APIs used: Robinhood, YahooFinance, Twitter, and Reddit.
+        <br><br>Unfortunately, due to mounting data storage costs and Robinhood changing their API [and also locking my account], this project is now deprecated and while you can still access historical data, it no longer updates :(`
+    },
+    {
+        title: "Appfolio",
+        skills: "FE, BE",
+        img: "appfolio",
+        desc:`During my internship at Appfolio, I got to work on their investment management portal used by General and Limited Partners in over 800 investment firms. Met 
+        directly with our clients to understand their business needs and deploy most value adding solutions in an AGILE development process. 
+        <br><br>Also conducted test driven development with Cypress to develop full stack features using React and Ruby. `
+    },
+    {
+        title: "Psychedelics",
+        skills: "FE, Research",
+        img: "psy",
+        desc:`While I usually would not put uni class projects here, this one was one of my personal favourties as it challenged me to not only
+        research, collaborate and write up about history and chemistry, as a challenge  `
     },
     {
         title: "NAVIS",
         skills: "FE, BE",
-        img: ""
-    },
-    {
-        title: "Psychedelics",
-        skills: "FE",
-        img: ""
-    },
-    {
-        title: "DIDA",
-        skills: "FE, PS",
-        img: ""
+        img: "nv",
+        desc:`Worked on a realtime vehicle tracking platform as part of my internship. While my work was focused on remaking the broken and outdated UI, I also got to collaborate with senior devs and help with a Node.JS as well as a MySQL server.
+        <br><br> Technologies used: Vue, JavaScript, Node, MySQL. 
+        <br><br> The deployment for this isn't public.`
     },
     {
         title: "HNRQ",
         skills: "FE",
-        img: ""
-    },
+        img: "hnrq",
+        desc:`Worked with a professor during an independent study at Duke to further develop <a href='https://dukedb-hnrq.github.io/#'>a web app</a> that helps students learn SQL 
+        via breaking down complex queries with tree structures and represent them in a visual, step by step way.`
+    }
 ]
