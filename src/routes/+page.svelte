@@ -93,7 +93,7 @@
 
 <section id="contact" style:--sizer={sizer}>
 	<div class="cont" class:zoomed={$R > 2.7}>
-		<a href="https://github.com">
+		<a href="https://github.com/humblef00ls">
 			<span
 				class="icon "
 				style={`transform: translate3d(${
@@ -117,7 +117,7 @@
 				>
 			</span>
 		</a>
-		<a href="https://github.com">
+		<a href="https://www.instagram.com/aparimeya.ai/">
 			<span
 				class="icon "
 				style={`transform: translate3d(${
@@ -148,7 +148,7 @@
 				>
 			</span>
 		</a>
-		<a href="https://github.com">
+		<a href="https://www.youtube.com/@aparimeya">
 			<span
 				class="icon "
 				style={`transform: translate3d(${
@@ -174,7 +174,7 @@
 				>
 			</span>
 		</a>
-		<a href="https://github.com">
+		<a href="https://twitter.com/aparimeya">
 			<span
 				class="icon "
 				style={`transform: translate3d(${
@@ -198,7 +198,7 @@
 				>
 			</span>
 		</a>
-		<a href="https://github.com">
+		<a href="https://www.linkedin.com/in/aparimeya-taneja-1a7300162">
 			<span
 				class="icon "
 				style={`transform: translate3d(${
@@ -226,7 +226,7 @@
 				>
 			</span>
 		</a>
-		<a href="https://github.com">
+		<a href="mailto:aparimeyataneja@gmail.com">
 			<span
 				class="icon "
 				style={`transform: translate3d(${
