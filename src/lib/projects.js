@@ -68,8 +68,10 @@ export default [
         title: "Psychedelics",
         skills: "FE, Research",
         img: "psy",
-        desc:`While I usually would not put uni class projects here, this one was one of my personal favourties as it challenged me to not only
-        research, collaborate and write up about history and chemistry, as a challenge  `
+        desc:`While I usually would not put uni class projects here, this one was one of my personal favourties. It challenged me to not only
+        research, collaborate and write about history and chemistry, I also wanted the medium of our presentation to be a cool website 
+        that tells the compound history of psychedelics via a <a href='https://psychedelics.netlify.app/'>timeline</a>. <br><br> If you are even remotely interested in history 
+        and science, highly recommend it!  `
     },
     {
         title: "NAVIS",

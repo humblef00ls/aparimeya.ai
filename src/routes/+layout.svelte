@@ -26,7 +26,7 @@
 <svelte:window bind:innerHeight={h} bind:innerWidth={w} />
 
 <svelte:head>
-	<title>aparimeya</title>
+	<title>Aparimeya Taneja</title>
 	<meta name="description" content="This website is a portfolio detailing all my projects and experiences. Learn more about me and contact me here! -aparimeya">
 	<meta name="keywords" content="Aparimeya Taneja, Aparimeya, aparimeya.ai, web dev, portfolio, profile">
 	<meta name="author" content="Aparimeya Taneja">
