@@ -2,7 +2,7 @@
 	import "./styles.css";
 
 	import Simulation from "$lib/Simulation.svelte";
-	import { Y, R } from "$lib/store";
+	import { Y, R ,V} from "$lib/store";
 	import { onMount } from "svelte";
 	let show = false
 	let h = 0,
@@ -47,7 +47,7 @@
 		rel="noreferrer"
 		href="https://aparimeya.medium.com/" on:click={()=>show = false}>blog</a>
 	</nav>
-	<div class="app" bind:this={box} on:scroll={handleScroll}>
+	<div class="app" bind:this={box} on:scroll={handleScroll} class:hider={!$V}>
 		<header class:slide={$Y > h / 2}>
 			{#if w > 600}
 				<h3 class:expand={P >= 0 && P < 1}><a href="#home">home</a></h3>
@@ -87,6 +87,9 @@
 {/if}
 
 <style>
+	.hider{
+		opacity: 0 !important;
+	}
 	nav{
 		transform: translate3d(0%,-100%,0);
 		height: 100dvh;

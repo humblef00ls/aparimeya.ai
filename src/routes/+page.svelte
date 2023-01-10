@@ -336,8 +336,8 @@
 	.aboutMe {
 		padding: 10px 20px;
 		background: rgba(150, 150, 150, 0.1);
-		backdrop-filter: blur(2px);
-		-webkit-backdrop-filter: blur(2px);
+		backdrop-filter: blur(0px);
+		-webkit-backdrop-filter: blur(0px);
 	}
 	.aboutMe h1 {
 		font-size: 1.75rem;
@@ -465,7 +465,7 @@
 	}
 	.slideIn {
 		transform: translate3d(0px, 0px, 0) !important;
-		opacity: 0.875 !important;
+		opacity: 0.75 !important;
 	}
 	.slideIn:nth-of-type(2) {
 		opacity: 0.95 !important;

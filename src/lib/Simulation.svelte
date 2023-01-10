@@ -2,11 +2,12 @@
     let canvas;
     import { onMount } from "svelte";
     import { draggable } from "@neodrag/svelte";
-    import { Y } from "$lib/store";
+    import { Y, V } from "$lib/store";
     let paused = false;
     let showDebugger = false;
     let fps = 0;
-    let S = 500;
+    let S = 400;
+    let Sd = S;
     let count = 0;
     let scaler = 2;
     let local = 70;
@@ -29,7 +30,11 @@
     let WD = {};
     let BD = {};
     let PD = {};
-
+    $: if (Math.abs(S - Sd) > 0) {
+        Sd = S;
+        cancelAnimationFrame(frameId);
+        setup();
+    }
     let points = [];
     let [white, red, blue, purple] = [[], [], [], []];
     const setup = (keepPos = false) => {
@@ -61,8 +66,8 @@
             for (let i = 0; i < n; i++) {
                 group.push(
                     point(
-                        Math.random() * (w - 100) + 50,
-                        Math.random() * (h - 100) + 50,
+                        Math.random() * (w - w / 3) + w / 6,
+                        Math.random() * (h - h / 3) + h / 6,
                         c,
                         Math.random() * 0.5 + s
                     )
@@ -117,12 +122,12 @@
 
         scaleX = S;
 
-        if (!keepPos && white.length == 0) {
+        if (!keepPos || white.length == 0) {
             points = [];
             white = create(scaleX * 2, W, 1);
             red = create(scaleX * 1.25, R, 2);
             blue = create(scaleX, B, 3);
-            purple = create(scaleX / 7, P, 4);
+            purple = create(scaleX/1.1 / 7, P, 4);
         }
 
         const times = [];
@@ -206,7 +211,7 @@
         setup();
     };
     const reset = () => {
-        S = 500;
+        S = 400;
         local = 70;
         damp = 0.95;
         margin = 5;
@@ -336,7 +341,11 @@
             <button on:click={pause}>
                 {#if paused} Resume {:else}Pause{/if}</button
             >
-
+        </span>
+        <span class="btns">
+            <button on:click={() => ($V = !$V)}>
+                {#if $V} Hide {:else}Show{/if}</button
+            >
             <button on:click={reset}>Reset</button>
         </span>
     </div>
@@ -355,6 +364,12 @@
         transition: 0.4s ease-in-out;
         opacity: 1;
         animation: rotation 20s infinite linear;
+    }
+    .btns button{
+        min-width: 90px;
+    }
+    .btns button:hover{
+        transform: scale(1.025);
     }
     .fade {
         opacity: 0.25;
@@ -385,7 +400,7 @@
         position: fixed;
         bottom: 5px;
         left: 5px;
-        z-index: 7;
+        z-index: 27;
         opacity: 1;
         border-radius: 15px;
         overflow: hidden;
