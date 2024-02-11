@@ -37,6 +37,34 @@
     }
     let points = [];
     let [white, red, blue, purple] = [[], [], [], []];
+
+    let editable = {
+        R: JSON.stringify({
+            r: "0.3 + 0.5 * COS",
+            b: "-1 - 0.23 * HS + 5 * SIN",
+            w: "0.2 - 0.07 * HS",
+            p: "-0.64 - 0.09 * HS",
+        }),
+        W: JSON.stringify({
+            r: "0.03 + 0.5 * COS",
+            b: "0.12 - 0.09 * HS",
+            w: "0.25 + POSSIN + 0.15 * COS",
+            p: "-0.2 + 0.5 * HS",
+        }),
+        B: JSON.stringify({
+            r: "-0.2 - 0.1 * HS",
+            b: "0.15 + 0.33 * POSCOS + 0.02 * HS",
+            w: "-0.07 + 0.05 * HS",
+            p: "-0.6",
+        }),
+        P: JSON.stringify({
+            r: "-1 + 0.15 * HS",
+            b: "-0.4 + HS * 0.075",
+            w: "-0.1 + 0.1 * HS",
+            p: "1 + 1.25 * HS + 4 * POSSIN",
+        }),
+    };
+
     const setup = (keepPos = false) => {
         h = window.innerHeight;
         w = window.innerWidth;
@@ -69,8 +97,8 @@
                         Math.random() * (w - w / 3) + w / 6,
                         Math.random() * (h - h / 3) + h / 6,
                         c,
-                        Math.random() * 0.5 + s
-                    )
+                        Math.random() * 0.5 + s,
+                    ),
                 );
                 points.push(group[i]);
             }
@@ -120,14 +148,28 @@
             ctx.fillRect(x - s / 2, y - s / 2, s, s);
         };
 
+        const evaluateExpression = (expression, variables) => {
+            try {
+                const cos = COS;
+                const sin = SIN;
+                const hs = HS;
+                const poscos = POSCOS;
+                const possin = POSSIN;
+                return eval(expression.toLowerCase());
+            } catch (e) {
+                console.error("Error evaluating expression:", e, variables);
+                return 0.0;
+            }
+        };
+
         scaleX = S;
 
         if (!keepPos || white.length == 0) {
             points = [];
-            white = create(scaleX * 2, W, 1);
-            red = create(scaleX * 1.25, R, 2);
-            blue = create(scaleX, B, 3);
-            purple = create(scaleX/1.1 / 7, P, 4);
+            white = create(scaleX * 2, W, 1.5);
+            red = create(scaleX * 1.25, R, 2.5);
+            blue = create(scaleX, B, 3.25);
+            purple = create(scaleX / 1.1 / 7, P, 5);
         }
 
         const times = [];
@@ -140,29 +182,77 @@
             }
             times.push(now);
             fps = times.length;
+            let RR,
+                RB,
+                RW,
+                RP,
+                BR,
+                BB,
+                BW,
+                BP,
+                WR,
+                WB,
+                WW,
+                WP,
+                PR,
+                PB,
+                PW,
+                PP = 0.0;
+
+            try {
+                const variables = {
+                    COS: COS, // Assuming COS is defined somewhere in your code
+                    HS: HS, // Assuming HS is defined somewhere in your code
+                    SIN: SIN,
+                };
+
+                const R_JSON = JSON.parse(editable.R);
+                RR = evaluateExpression(R_JSON.r, variables);
+                RB = evaluateExpression(R_JSON.b, variables);
+                RW = evaluateExpression(R_JSON.w, variables);
+                RP = evaluateExpression(R_JSON.p, variables);
+                const B_JSON = JSON.parse(editable.B);
+                BR = evaluateExpression(B_JSON.r, variables);
+                BB = evaluateExpression(B_JSON.b, variables);
+                BW = evaluateExpression(B_JSON.w, variables);
+                BP = evaluateExpression(B_JSON.p, variables);
+                const W_JSON = JSON.parse(editable.W);
+                WR = evaluateExpression(W_JSON.r, variables);
+                WB = evaluateExpression(W_JSON.b, variables);
+                WW = evaluateExpression(W_JSON.w, variables);
+                WP = evaluateExpression(W_JSON.p, variables);
+                const P_JSON = JSON.parse(editable.R);
+                PR = evaluateExpression(P_JSON.r, variables);
+                PB = evaluateExpression(P_JSON.b, variables);
+                PW = evaluateExpression(P_JSON.w, variables);
+                PP = evaluateExpression(P_JSON.p, variables);
+            } catch (e) {
+                console.log(e);
+            }
+
             RD = {
-                r: 0.4 + 0.2 * COS + 0.09 * HS,
-                b: -1 - 0.23 * HS + 5 * SIN,
-                w: 0.2 - 0.07 * HS,
-                p: -0.64 - 0.09 * HS,
+                r: RR,
+                b: RB,
+                w: RW,
+                p: RP,
             };
             WD = {
-                r: 0.03 + 0.5 * COS,
-                b: 0.12 - 0.09 * HS,
-                w: 0.25 + POSSIN + 0.15 * COS,
-                p: -0.2 + 0.5 * HS,
+                r: WR,
+                b: WB,
+                w: WW,
+                p: WP,
             };
             BD = {
-                r: -0.2 - 0.1 * HS,
-                b: 0.15 + 0.33 * POSCOS + 0.02 * HS,
-                w: -0.07 + 0.05 * HS,
-                p: -0.6,
+                r: BR,
+                b: BB,
+                w: BW,
+                p: BP,
             };
             PD = {
-                r: -1 + 0.15 * HS,
-                b: -0.4 + HS * 0.075,
-                w: -0.1 + 0.1 * HS,
-                p: 1 + 1.25 * HS + 4 * POSSIN,
+                r: PR,
+                b: PB,
+                w: PW,
+                p: PP,
             };
             if (!paused) {
                 rule(red, red, RD.r);
@@ -324,27 +414,35 @@
             </span>
 
             <span>
-                r : {JSON.stringify(lim(RD))}
+                r :{JSON.stringify(lim(RD))}
+                <textarea bind:value={editable.R} />
             </span>
             <span>
                 w : {JSON.stringify(lim(WD))}
+                <textarea bind:value={editable.W} />
             </span>
             <span>
                 b : {JSON.stringify(lim(BD))}
+                <textarea bind:value={editable.B} />
             </span>
             <span>
                 p : {JSON.stringify(lim(PD))}
+                <textarea bind:value={editable.P} />
             </span>
         </div>
         <span class="btns">
             <button on:click={restart}>Restart</button>
             <button on:click={pause}>
-                {#if paused} Resume {:else}Pause{/if}</button
+                {#if paused}
+                    Resume
+                {:else}Pause{/if}</button
             >
         </span>
         <span class="btns">
             <button on:click={() => ($V = !$V)}>
-                {#if $V} Hide {:else}Show{/if}</button
+                {#if $V}
+                    Hide
+                {:else}Show{/if}</button
             >
             <button on:click={reset}>Reset</button>
         </span>
@@ -365,10 +463,10 @@
         opacity: 1;
         animation: rotation 20s infinite linear;
     }
-    .btns button{
+    .btns button {
         min-width: 90px;
     }
-    .btns button:hover{
+    .btns button:hover {
         transform: scale(1.025);
     }
     .fade {
@@ -417,6 +515,11 @@
         padding: 5px;
         display: flex;
         flex-direction: column;
+    }
+    .sub-panel textarea {
+        width: 100%;
+        padding: 4px;
+        margin-top: 5px;
     }
     .sub-panel > span {
         display: flex;
