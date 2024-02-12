@@ -509,12 +509,13 @@
         font-size: 0.75rem;
         -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
-        min-width: 300px;
+        min-width: 400px;
     }
     .sub-panel {
-        padding: 5px;
+        padding: 25px;
         display: flex;
         flex-direction: column;
+        width: 100%;
     }
     .sub-panel textarea {
         width: 100%;
@@ -532,8 +533,9 @@
         padding: 5px;
         min-width: 100%;
         text-align: center;
-        cursor: grab;
+        cursor: move;
         position: relative;
+
     }
     .handle:focus {
         cursor: grabbing;
