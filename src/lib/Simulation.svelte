@@ -6,10 +6,10 @@
     let paused = false;
     let showDebugger = false;
     let fps = 0;
-    let S = 350;
+    let S = 370;
     let Sd = S;
     let count = 0;
-    let scaler = 2;
+    let scaler = 1;
     let local = 90;
     $: minDim = Math.min(w, h);
     let frameId = null;
@@ -22,6 +22,9 @@
     $: POSSIN = Math.abs(SIN);
     $: POSCOS = Math.abs(COS);
     let margin = 5;
+    let maxF = 200
+    let maxV = 100
+    let Vdamp = 1.5
     let scaleX;
     $: push = margin + Math.max(100, minDim / 4) * Math.abs(SIN);
     let [h, w] = [0, 0];
@@ -40,31 +43,32 @@
 
     let editable = {
         R: JSON.stringify({
-            r: "0.3 + 0.5 * COS",
-            b: "-1 - 0.23 * HS + 5 * SIN",
-            w: "0.2 - 0.07 * HS",
-            p: "-0.64 - 0.09 * HS",
+            r: "3 + 0.5 * -COS",
+            b: "-1 -  HS + 2.5 * SIN",
+            w: "-2 - 0.07 * HS",
+            p: "-2 + 2.1*HS",
         }),
         W: JSON.stringify({
-            r: "0.03 + 0.5 * COS",
-            b: "0.12 - 0.09 * HS",
-            w: "0.25 + POSSIN + 0.15 * COS",
-            p: "-0.2 + 0.5 * HS",
+            r: "-1 + 0.5 * COS",
+            b: "-0.5 - 0.09 * HS",
+            w: "1.25 + POSSIN ",
+            p: "-1.5 - HS",
         }),
         B: JSON.stringify({
-            r: "-0.2 - 0.1 * HS",
-            b: "0.15 + 0.33 * POSCOS + 0.02 * HS",
-            w: "-0.07 + 0.05 * HS",
-            p: "-0.6",
+            r: "-1.5 - 0.1 * HS",
+            b: "2.5  + 2.5*  COS + .5*HS",
+            w: "-2 + 0.05 * HS",
+            p: "-0.75+HS",
         }),
         P: JSON.stringify({
-            r: "-1 + 0.15 * HS",
-            b: "-0.4 + HS * 0.075",
-            w: "-0.1 + 0.1 * HS",
-            p: "1 + 1.25 * HS + 4 * POSSIN",
+            r: "-2 + 0.15 * HS",
+            b: "-3 + HS * 0.075",
+            w: "-1 + 0.1 * HS",
+            p: "5 + 1.25 * HS - 4 * POSSIN",
         }),
     };
 
+    let boost = 15
     const setup = (keepPos = false) => {
         h = window.innerHeight;
         w = window.innerWidth;
@@ -97,7 +101,7 @@
                         Math.random() * (w - w / 3) + w / 6,
                         Math.random() * (h - h / 3) + h / 6,
                         c,
-                        Math.random() * 0.5 + s,
+                        Math.random() * 0.5 + s/2
                     ),
                 );
                 points.push(group[i]);
@@ -122,11 +126,22 @@
                     }
                 }
 
-                a.vx = (a.vx / (scaler + a.s) + fx) * 0.5;
-                a.vy = (a.vy / (scaler + a.s) + fy) * 0.5;
+                let distanceFromCenterX = Math.abs(w / 2 - a.x);
+                let distanceFromCenterY = Math.abs(h / 2 - a.y);
+                let curveEffectX = Math.exp(-Math.pow(distanceFromCenterX / (w / 5), 2));
+                let curveEffectY = Math.exp(-Math.pow(distanceFromCenterY / (h / 5), 2));
+                a.vx +=    curveEffectX * boost*5 * (a.x < w / 2 ? 1 : -1);
+                a.vy +=   curveEffectY * boost*5 * (a.y < h / 2 ? 1 : -1);
+                a.vx = (a.vx / (scaler + a.s) + fx > 0 ?  Math.min(fx,maxF) : Math.max(fx,-maxF)) * 0.5 
+                a.vy = (a.vy / (scaler + a.s) + fy > 0 ?  Math.min(fy,maxF) : Math.max(fy,-maxF)) * 0.5 
 
-                a.x += a.vx;
-                a.y += a.vy;
+                
+                a.vx = a.vx > maxV ||  a.vx < -maxV ? a.vx/2 : a.vx
+                a.vy = a.vy > maxV ||  a.vy < -maxV ? a.vy/2 : a.vy
+                
+            
+                a.x += a.vx/Vdamp;
+                a.y += a.vy/Vdamp;
                 if (a.x < margin) {
                     a.vx = a.vx + push;
                     a.x = margin;
@@ -166,10 +181,10 @@
 
         if (!keepPos || white.length == 0) {
             points = [];
-            white = create(scaleX * 1.5, W, 1.5);
-            red = create(scaleX * 1.2, R, 2.5);
-            blue = create(scaleX/1.2, B, 3.25);
-            purple = create(scaleX / 1.75 / 7, P, 5);
+            white = create(scaleX * 2, W, 2.5);
+            red = create(scaleX * 1.2, R, 4.5);
+            blue = create(scaleX/1.2, B, 6.125);
+            purple = create(scaleX / 1.75 / 7, P, 11);
         }
 
         const times = [];
@@ -198,6 +213,11 @@
                 PB,
                 PW,
                 PP = 0.0;
+
+                
+                boost  =  boost <= 0.1 && boost >= -.1 ? 0: boost > .1 ?  boost - .1 : boost +.1
+                
+           
 
             try {
                 const variables = {
@@ -407,6 +427,54 @@
                     max="3"
                     step=".01"
                     name="D"
+                />
+            </span>
+            <span>
+                <label for="A">
+                    <t> Attractor Force: </t>
+                    <v>
+                        {lim(boost)}
+                    </v>
+                </label>
+                <input
+                    type="range"
+                    bind:value={boost}
+                    min="-20"
+                    max="20"
+                    step=".025"
+                    name="A"
+                />
+            </span>
+            <span>
+                <label for="MF">
+                    <t> Max Force: </t>
+                    <v>
+                        {lim(maxF)}
+                    </v>
+                </label>
+                <input
+                    type="range"
+                    bind:value={maxF}
+                    min="5"
+                    max="200"
+                    step="5"
+                    name="MF"
+                />
+            </span>
+            <span>
+                <label for="VD">
+                    <t> Velocity Damping: </t>
+                    <v>
+                        {lim(Vdamp)}
+                    </v>
+                </label>
+                <input
+                    type="range"
+                    bind:value={Vdamp}
+                    min="-10"
+                    max="10"
+                    step=".1"
+                    name="VD"
                 />
             </span>
             <span>
