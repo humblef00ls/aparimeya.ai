@@ -6,11 +6,11 @@
     let paused = false;
     let showDebugger = false;
     let fps = 0;
-    let S = 400;
+    let S = 350;
     let Sd = S;
     let count = 0;
     let scaler = 2;
-    let local = 70;
+    let local = 90;
     $: minDim = Math.min(w, h);
     let frameId = null;
     $: ll = local + minDim / 100 + POSSIN + HS * 4;
@@ -166,10 +166,10 @@
 
         if (!keepPos || white.length == 0) {
             points = [];
-            white = create(scaleX * 2, W, 1.5);
-            red = create(scaleX * 1.25, R, 2.5);
-            blue = create(scaleX, B, 3.25);
-            purple = create(scaleX / 1.1 / 7, P, 5);
+            white = create(scaleX * 1.5, W, 1.5);
+            red = create(scaleX * 1.2, R, 2.5);
+            blue = create(scaleX/1.2, B, 3.25);
+            purple = create(scaleX / 1.75 / 7, P, 5);
         }
 
         const times = [];
