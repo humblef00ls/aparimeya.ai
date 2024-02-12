@@ -26,10 +26,10 @@
     $: push = margin + Math.max(100, minDim / 4) * Math.abs(SIN);
     let [h, w] = [0, 0];
     const [R, W, B, P, BG] = ["red", "white", "cyan", "purple", "black"];
-    let RD = {};
-    let WD = {};
-    let BD = {};
-    let PD = {};
+    let _RD = {};
+    let _WD = {};
+    let _BD = {};
+    let _PD = {};
     $: if (Math.abs(S - Sd) > 0) {
         Sd = S;
         cancelAnimationFrame(frameId);
@@ -230,47 +230,47 @@
                 console.log(e);
             }
 
-            RD = {
+            _RD = {
                 r: RR,
                 b: RB,
                 w: RW,
                 p: RP,
             };
-            WD = {
+            _WD = {
                 r: WR,
                 b: WB,
                 w: WW,
                 p: WP,
             };
-            BD = {
+            _BD = {
                 r: BR,
                 b: BB,
                 w: BW,
                 p: BP,
             };
-            PD = {
+            _PD = {
                 r: PR,
                 b: PB,
                 w: PW,
                 p: PP,
             };
             if (!paused) {
-                rule(red, red, RD.r);
-                rule(red, blue, RD.b);
-                rule(red, white, RD.w);
-                rule(red, purple, RD.p);
-                rule(white, red, WD.r);
-                rule(white, blue, WD.b);
-                rule(white, white, WD.w);
-                rule(white, purple, WD.p);
-                rule(blue, white, BD.w);
-                rule(blue, red, BD.r);
-                rule(blue, blue, BD.b);
-                rule(blue, purple, BD.p);
-                rule(purple, white, PD.w);
-                rule(purple, purple, PD.p);
-                rule(purple, red, PD.r);
-                rule(purple, blue, PD.b);
+                rule(red, red, _RD.r);
+                rule(red, blue, _RD.b);
+                rule(red, white, _RD.w);
+                rule(red, purple, _RD.p);
+                rule(white, red, _WD.r);
+                rule(white, blue, _WD.b);
+                rule(white, white, _WD.w);
+                rule(white, purple, _WD.p);
+                rule(blue, white, _BD.w);
+                rule(blue, red, _BD.r);
+                rule(blue, blue, _BD.b);
+                rule(blue, purple, _BD.p);
+                rule(purple, white, _PD.w);
+                rule(purple, purple, _PD.p);
+                rule(purple, red, _PD.r);
+                rule(purple, blue, _PD.b);
             }
             ctx.fillStyle = BG;
             ctx.fillRect(0, 0, w, h);
@@ -314,6 +314,11 @@
         cancelAnimationFrame(frameId);
         setup(true);
     };
+    $: RD = lim(_RD);
+    $: WD = lim(_WD);
+    $: BD = lim(_BD);
+    $: PD = lim(_PD);
+
 </script>
 
 <button
@@ -358,8 +363,10 @@
             </span>
             <span>
                 <label for="R">
-                    Base Radius:
-                    {lim(ll)}
+                    <t> Base Radius: </t>
+                    <v>
+                        {lim(ll)}
+                    </v>
                 </label>
                 <input
                     type="range"
@@ -372,8 +379,10 @@
             </span>
             <span>
                 <label for="N">
-                    Num of particles:
-                    {lim(count)}
+                    <t> Num of particles: </t>
+                    <v>
+                        {lim(count)}
+                    </v>
                 </label>
                 <input
                     type="range"
@@ -386,8 +395,10 @@
             </span>
             <span>
                 <label for="D">
-                    Force Multiplier:
-                    {lim(dd)}
+                    <t> Force Multiplier: </t>
+                    <v>
+                        {lim(dd)}
+                    </v>
                 </label>
                 <input
                     type="range"
@@ -400,8 +411,10 @@
             </span>
             <span>
                 <label for="M">
-                    Margin:
-                    {lim(margin)}
+                    <t> Margin: </t>
+                    <v>
+                        {lim(margin)}
+                    </v>
                 </label>
                 <input
                     type="range"
@@ -414,19 +427,19 @@
             </span>
 
             <span>
-                r :{JSON.stringify(lim(RD))}
+                r: [r: {RD.r}, w: {RD.w}, b: {RD.b}, p: {RD.p}]
                 <textarea bind:value={editable.R} />
             </span>
             <span>
-                w : {JSON.stringify(lim(WD))}
+                w: [r: {WD.r}, w: {WD.w}, b: {WD.b}, p: {WD.p}]
                 <textarea bind:value={editable.W} />
             </span>
             <span>
-                b : {JSON.stringify(lim(BD))}
+                b: [r: {BD.r}, w: {BD.w}, b: {BD.b}, p: {BD.p}]
                 <textarea bind:value={editable.B} />
             </span>
             <span>
-                p : {JSON.stringify(lim(PD))}
+                p: [r: {PD.r}, w: {PD.w}, b: {PD.b}, p: {PD.p}]
                 <textarea bind:value={editable.P} />
             </span>
         </div>
@@ -463,11 +476,23 @@
         opacity: 1;
         animation: rotation 20s infinite linear;
     }
+    .btns {
+        display: flex;
+        &:last-of-type {
+            margin-bottom: 30px;
+        }
+    }
     .btns button {
         min-width: 90px;
+        font-weight: normal;
+        color: white;
+        border-radius: 5px;
+
+        border: 2px solid white;
+        background-color: rgba(255, 255, 255, 0.25);
     }
     .btns button:hover {
-        transform: scale(1.025);
+        transform: scale(1.1);
     }
     .fade {
         opacity: 0.25;
@@ -504,24 +529,65 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: rgba(0, 0, 0, 0.2);
         font-family: "Space Mono", monospace;
         font-size: 0.75rem;
-        -webkit-backdrop-filter: blur(4px);
-        backdrop-filter: blur(4px);
-        min-width: 400px;
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
+        width: 100vw;
+        max-width: 420px;
+        min-width: 200px;
+    }
+    .panel * {
+        font-family: "Space Mono", monospace;
+        font-weight: bold;
     }
     .sub-panel {
         padding: 25px;
+        padding-bottom: 10px;
         display: flex;
         flex-direction: column;
         width: 100%;
     }
     .sub-panel textarea {
         width: 100%;
-        padding: 4px;
+        font-weight: normal;
+        padding: 5px;
         margin-top: 5px;
+        color: white;
+        border-radius: 5px;
+
+        border: 2px solid white;
+        background-color: rgba(255, 255, 255, 0.25);
+        & :focus {
+            outline: none;
+        }
     }
+    t,
+    v {
+        margin: 0px;
+        display: inline-block;
+        font-weight: bold;
+    }
+    .sub-panel label {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    textarea {
+        border: none;
+        overflow: auto;
+        outline: none;
+
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
+
+
+        resize: none; /*remove the resize handle on the bottom right*/
+    }
+
     .sub-panel > span {
         display: flex;
         flex-direction: column;
@@ -535,7 +601,6 @@
         text-align: center;
         cursor: move;
         position: relative;
-
     }
     .handle:focus {
         cursor: grabbing;
