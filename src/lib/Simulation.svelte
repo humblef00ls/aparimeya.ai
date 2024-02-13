@@ -68,7 +68,7 @@
         }),
     };
 
-    let boost = 15
+    let boost = 5
     const setup = (keepPos = false) => {
         h = window.innerHeight;
         w = window.innerWidth;
@@ -130,12 +130,13 @@
                 let distanceFromCenterY = Math.abs(h / 2 - a.y);
                 let curveEffectX = Math.exp(-Math.pow(distanceFromCenterX / (w / 5), 2));
                 let curveEffectY = Math.exp(-Math.pow(distanceFromCenterY / (h / 5), 2));
-                a.vx +=    curveEffectX * boost*5 * (a.x < w / 2 ? 1 : -1);
-                a.vy +=   curveEffectY * boost*5 * (a.y < h / 2 ? 1 : -1);
+            
                 a.vx = (a.vx / (scaler + a.s) + fx > 0 ?  Math.min(fx,maxF) : Math.max(fx,-maxF)) * 0.5 
                 a.vy = (a.vy / (scaler + a.s) + fy > 0 ?  Math.min(fy,maxF) : Math.max(fy,-maxF)) * 0.5 
 
-                
+                a.vx +=    curveEffectX * boost*5 * (a.x < w / 2 ? 1 : -1);
+                a.vy +=   curveEffectY * boost*5 * (a.y < h / 2 ? 1 : -1);
+
                 a.vx = a.vx > maxV ||  a.vx < -maxV ? a.vx/2 : a.vx
                 a.vy = a.vy > maxV ||  a.vy < -maxV ? a.vy/2 : a.vy
                 
