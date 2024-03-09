@@ -1,5 +1,16 @@
 export default [
     {
+        title: "Genesis.AI",
+        skills: "FE, BE, AI",
+        img: "genesis",
+        desc: `Genesis is a custom built ML model & pipeline running platform. My friend and I setup the end to end infrastructure needed to host & serve any model of any modalitym and in the future I plan to make a gen ai based animation tool.
+        <br><br>
+        This frontend app is written in SvelteKit and deployed on Vercel. 
+        Generation requests get routed to a Modal Labs deployment that spins up containers and executes our pipeline [ generation → conversion → etc ]. 
+        This way we can process requests in parallel and also save money by only paying for usage.
+        We use Supabase to host a SQL DB that tracks each request, and have provisioned an R2 Cloudflare storage bucket to save generations.`,
+    },
+    {
         title: "DoorDash",
         skills: "FE, BE, AI",
         img: "doordash",
@@ -7,20 +18,9 @@ export default [
         new verticals org, search experience team. Other responsibilites of my role include on-call rotations, building admin tooling, interviewing, and working
         on cross team projects to enable downstream dependencies.
         <br><br>
-        Apart from my expected tasks, I also took the initiative to launch a project that leverages Large Language Models like GPT-3 to save us 2 - 3
+        Apart from my usual work, I also took the initiative to launch a project that leverages Large Language Models like GPT-3 to save us 2 - 3
         million USD per year in offshore BPO vendor costs, as well as improve our catalog data significantly.
         <br><br> Primarily, I work with Kotlin, Python and TypeScript code bases.`,
-    },
-    {
-        title: "aparimeya.[_]",
-        skills: "FE",
-        img: "portfolio",
-        desc: `As an engineer with a diverse skillset, from coding focused disciplines like full stack dev to creative pursuits like digital art to now new frontiers like prompt engineering, I wanted to remake my portfolio website to reflect my unique profile. 
-       <br><br> In 2022, after I started using generative AI [GPT, SD, etc.] to make business solutions, art, etc., I decided this is the field of tech I want to explore and establish myself in, and thus wanted to incorporate AI to be a core theme in  <a href='https://aparimeya.ai'>this website</a>'s design 
-        But what does a particle simulation have to do with AI? Well, when I think of "intellegence", what comes to mind isn't neural networks, but rather something much more fundamental to our very existance: emergence. \ 
-       <br><br> It's all around us and yet we rarely think about it in its most basic form, and so I figured this would make for an interesting interactive centerpiece. The order and patterns you observe in the chaotic soup of pixels flying around is not defined anywhere in the code; this is all just a result of a few basic rules that define how the 4 different 
-        types of particles attract and repel each other [these values change as you scroll thus leading to new kinds of patterns]. 
-        <br><br> Feel free to play around with the simulation hyper paramters [by clicking the cog icon in the bottom left] & check out my  <a href='https://aparimeya.xyz'>previous portfolio website</a> that I left up because I really like the centerpiece in that one too [space themed since I think space is really cool!].`,
     },
     {
         title: "humblef00ls",
@@ -63,6 +63,17 @@ export default [
         desc:`During my internship at Appfolio, I got to work on their investment management portal used by General and Limited Partners in over 800 investment firms. Met 
         directly with our clients to understand their business needs and deploy most value adding solutions in an AGILE development process. 
         <br><br>Also conducted test driven development with Cypress to develop full stack features using React and Ruby. `
+    },
+    {
+        title: "aparimeya.[_]",
+        skills: "FE",
+        img: "portfolio",
+        desc: `As an engineer with a diverse skillset, from coding focused disciplines like full stack dev to creative pursuits like digital art to now new frontiers like prompt engineering, I wanted to remake my portfolio website to reflect my unique profile. 
+       <br><br> In 2022, after I started using generative AI [GPT, SD, etc.] to make business solutions, art, etc., I decided this is the field of tech I want to explore and establish myself in, and thus wanted to incorporate AI to be a core theme in  <a href='https://aparimeya.ai'>this website</a>'s design 
+        But what does a particle simulation have to do with AI? Well, when I think of "intellegence", what comes to mind isn't neural networks, but rather something much more fundamental to our very existance: emergence. \ 
+       <br><br> It's all around us and yet we rarely think about it in its most basic form, and so I figured this would make for an interesting interactive centerpiece. The order and patterns you observe in the chaotic soup of pixels flying around is not defined anywhere in the code; this is all just a result of a few basic rules that define how the 4 different 
+        types of particles attract and repel each other [these values change as you scroll thus leading to new kinds of patterns]. 
+        <br><br> Feel free to play around with the simulation hyper paramters [by clicking the cog icon in the bottom left] & check out my  <a href='https://aparimeya.xyz'>previous portfolio website</a> that I left up because I really like the centerpiece in that one too [space themed since I think space is really cool!].`,
     },
     {
         title: "Psychedelics",
